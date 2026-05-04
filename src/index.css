@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-healthcare-light text-slate-800 font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-['Outfit'] font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-premium rounded-2xl;
+  }
+  
+  .btn-primary {
+    @apply bg-healthcare-blue text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-healthcare-blue border border-healthcare-blue/20 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:bg-healthcare-blue/5 hover:shadow-md active:scale-[0.98];
+  }
+
+  .nav-link {
+    @apply text-slate-600 hover:text-healthcare-blue font-medium transition-colors duration-200;
+  }
+
+  .nav-link-active {
+    @apply text-healthcare-blue;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-healthcare-blue/20 focus:border-healthcare-blue outline-none transition-all duration-200;
+  }
+}
+
+/* Custom Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-healthcare-blue to-healthcare-teal;
+}

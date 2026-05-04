@@ -1,0 +1,52 @@
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import api from '../services/api';
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const token = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
+      
+      if (token && savedUser) {
+        setUser(JSON.parse(savedUser));
+      }
+      setLoading(false);
+    };
+    checkLoggedIn();
+  }, []);
+
+  const login = async (email, password) => {
+    const response = await api.post('/auth/login', { email, password });
+    const { access_token, role, name } = response.data;
+    
+    const userData = { email, role, name };
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    return response.data;
+  };
+
+  const register = async (userData) => {
+    const response = await api.post('/auth/register', userData);
+    return response.data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
