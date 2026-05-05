@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Shield, Activity, LogOut, Camera, Save, ArrowLeft } from 'lucide-react';
+import { User, Mail, Shield, Activity, LogOut, Camera, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../services/api';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+  
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -19,6 +24,56 @@ const Profile = () => {
       : 'U';
   };
 
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('email', formData.email);
+      data.append('image', file);
+
+      const response = await api.put('/auth/profile', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      updateUser({ profile_image: response.data.profile_image });
+    } catch (err) {
+      console.error('Failed to upload image', err);
+      alert('Failed to upload profile image.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('email', formData.email);
+
+      const response = await api.put('/auth/profile', data);
+      updateUser({ 
+        name: response.data.name, 
+        email: response.data.email 
+      });
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Failed to update profile', err);
+      alert(err.response?.data?.detail || 'Failed to update profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] pt-32 pb-20 px-6 lg:px-10">
       <div className="max-w-5xl mx-auto">
@@ -26,7 +81,7 @@ const Profile = () => {
         {/* Editorial Breadcrumb */}
         <div className="mb-12">
           <Link to="/" className="text-[#6B7280] hover:text-[#111111] transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-            <ArrowLeft size={14} /> Back to inspiration
+            <ArrowLeft size={14} /> Back to dashboard
           </Link>
         </div>
 
@@ -36,10 +91,33 @@ const Profile = () => {
           
           <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
             <div className="relative group">
-              <div className="w-32 h-32 bg-[#111111] text-white flex items-center justify-center rounded-[2rem] text-4xl font-bold shadow-2xl">
-                {getInitials(user?.name)}
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              <div 
+                className="w-32 h-32 bg-[#111111] text-white flex items-center justify-center rounded-[2rem] text-4xl font-bold shadow-2xl overflow-hidden relative"
+              >
+                {user?.profile_image ? (
+                  <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  getInitials(user?.name)
+                )}
+                
+                {uploading && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-white" />
+                  </div>
+                )}
               </div>
-              <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-white text-[#111111] rounded-xl border border-[#E5E7EB] flex items-center justify-center shadow-lg hover:bg-[#F3F4F6] transition-all">
+              <button 
+                onClick={handleImageClick}
+                disabled={uploading}
+                className="absolute -bottom-2 -right-2 w-10 h-10 bg-white text-[#111111] rounded-xl border border-[#E5E7EB] flex items-center justify-center shadow-lg hover:bg-[#F3F4F6] transition-all disabled:opacity-50"
+              >
                 <Camera size={18} />
               </button>
             </div>
@@ -91,14 +169,16 @@ const Profile = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 gap-8">
+              <form onSubmit={handleSave} className="grid grid-cols-1 gap-8">
                 <div className="group">
                   <label className="block text-[11px] font-bold text-[#6B7280] uppercase tracking-widest mb-3 ml-1">Full Identity Name</label>
                   <input 
                     type="text" 
                     value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className={`input-standard w-full ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
                     disabled={!isEditing}
+                    required
                   />
                 </div>
 
@@ -107,22 +187,26 @@ const Profile = () => {
                   <input 
                     type="email" 
                     value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className={`input-standard w-full ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
                     disabled={!isEditing}
+                    required
                   />
                 </div>
 
                 {isEditing && (
                   <div className="pt-4 flex justify-end">
                     <button 
-                      onClick={() => setIsEditing(false)}
-                      className="btn-primary-dark flex items-center gap-3"
+                      type="submit"
+                      disabled={loading}
+                      className="btn-primary-dark flex items-center gap-3 disabled:opacity-50"
                     >
-                      <Save size={18} /> Save Changes
+                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
+                      Save Changes
                     </button>
                   </div>
                 )}
-              </div>
+              </form>
             </div>
 
             <div className="premium-job-card !p-12">
