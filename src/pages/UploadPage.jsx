@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileImage, CheckCircle, AlertCircle, Loader2, Eye, Download, Activity } from 'lucide-react';
+import { Upload, X, FileImage, CheckCircle, AlertCircle, Loader2, Eye, Download, Activity, Zap, ShieldCheck, ArrowRight, Clipboard, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -16,7 +16,7 @@ const UploadPage = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       if (!selectedFile.type.startsWith('image/')) {
-        setError('Please upload an image file.');
+        setError('Please upload a valid ECG image file.');
         return;
       }
       setFile(selectedFile);
@@ -39,7 +39,7 @@ const UploadPage = () => {
       });
       setResult(response.data);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to analyze image. Please try again.');
+      setError(err.response?.data?.detail || 'Analysis engine failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -54,13 +54,11 @@ const UploadPage = () => {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `report_${predictionId}.pdf`);
-      document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Download failed', err);
-      alert('Failed to download report. Please try again.');
     }
   };
 
@@ -74,7 +72,6 @@ const UploadPage = () => {
       window.open(fileURL);
     } catch (err) {
       console.error('View failed', err);
-      alert('Failed to view report. Please try again.');
     }
   };
 
@@ -86,192 +83,199 @@ const UploadPage = () => {
   };
 
   return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-healthcare-dark">New ECG Analysis</h1>
-        <p className="text-slate-500 mt-2">Upload your heart rate image for AI classification</p>
+    <div className="pt-32 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5]">
+      {/* Editorial Header - Centered */}
+      <div className="flex flex-col items-center text-center mb-16 gap-4">
+        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
+          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+          Neural Classification Engine
+          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+        </div>
+        <h1 className="text-3xl lg:text-4xl font-bold text-[#111111] tracking-tight mb-2">New Analysis</h1>
+        <p className="text-[#6B7280] text-base font-medium max-w-lg">Upload ECG traces for instantaneous AI-powered assessment.</p>
+        
+        {result && (
+          <button onClick={reset} className="mt-4 btn-outline-dark flex items-center gap-2 text-xs">
+            <Activity size={14} /> New Investigation
+          </button>
+        )}
       </div>
 
-      <div className="glass-card p-8">
+      <div className="max-w-4xl mx-auto space-y-10">
         {!result ? (
-          <div className="space-y-8">
-            {/* Upload Area */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white p-8 border border-[#E5E7EB] rounded-[2rem] shadow-xl"
+          >
             {!file ? (
-              <label className="relative block border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center hover:border-healthcare-blue hover:bg-healthcare-blue/5 transition-all cursor-pointer group">
+              <label className="relative block border-2 border-dashed border-[#E5E7EB] rounded-[1.5rem] p-12 text-center hover:border-[#111111] hover:bg-[#F9FAFB] transition-all cursor-pointer group">
                 <input 
                   type="file" 
                   className="hidden" 
                   accept="image/*"
                   onChange={handleFileChange}
                 />
-                <div className="w-20 h-20 bg-healthcare-light rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                  <Upload className="w-10 h-10 text-healthcare-blue" />
+                <div className="w-16 h-16 bg-[#F3F4F6] text-[#111111] flex items-center justify-center mx-auto mb-6 rounded-2xl group-hover:bg-[#111111] group-hover:text-white transition-all">
+                  <Upload size={24} />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Click to upload or drag & drop</h3>
-                <p className="text-slate-400">PNG, JPG or JPEG (Max. 5MB)</p>
+                <h3 className="text-xl font-bold mb-2 text-[#111111]">Drop clinical image here</h3>
+                <p className="text-[#6B7280] text-[10px] font-bold uppercase tracking-widest">JPEG, PNG or DICOM exports</p>
               </label>
             ) : (
-              <div className="relative rounded-3xl overflow-hidden border border-slate-200 shadow-lg">
-                <img src={preview} alt="Preview" className="w-full h-80 object-contain bg-slate-50" />
-                <button 
-                  onClick={reset}
-                  className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur rounded-full shadow-md text-slate-600 hover:text-red-500 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur border-t border-slate-100 flex items-center gap-3">
-                  <FileImage className="w-5 h-5 text-healthcare-blue" />
-                  <span className="text-sm font-medium text-slate-700 truncate">{file.name}</span>
+              <div className="space-y-6">
+                <div className="relative rounded-[1.5rem] overflow-hidden border border-[#E5E7EB] shadow-lg group bg-[#F9FAFB]">
+                  <img src={preview} alt="ECG Trace" className="w-full h-[300px] object-contain" />
+                  <div className="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                    <button 
+                      onClick={reset}
+                      className="px-6 py-3 bg-white text-red-500 rounded-xl shadow-xl hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      <X size={14} /> Remove Image
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-[#F9FAFB] border border-[#E5E7EB] gap-6 rounded-2xl">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white border border-[#E5E7EB] text-[#111111] rounded-xl">
+                      <FileImage size={20} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-bold text-[#111111] uppercase tracking-widest truncate max-w-[200px]">{file.name}</div>
+                      <div className="text-[9px] text-[#6B7280] font-bold uppercase tracking-widest mt-0.5">{(file.size / (1024 * 1024)).toFixed(2)} MB</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleUpload}
+                    disabled={loading}
+                    className="btn-primary-dark !py-4 !px-8 text-xs flex items-center justify-center gap-3 w-full sm:w-auto"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>Initialize AI Analysis <ArrowRight size={16} /></>
+                    )}
+                  </button>
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3 text-sm">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <div className="mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider">
+                <AlertCircle size={16} />
                 {error}
               </div>
             )}
-
-            <div className="flex justify-center">
-              <button 
-                onClick={handleUpload}
-                disabled={!file || loading}
-                className="btn-primary px-10 py-4 text-lg flex items-center justify-center gap-2 min-w-[220px]"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                    Analyzing Image...
-                  </>
-                ) : (
-                  'Run AI Analysis'
-                )}
-              </button>
-            </div>
-          </div>
+          </motion.div>
         ) : (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border border-[#E5E7EB] rounded-[2rem] shadow-2xl overflow-hidden"
           >
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
-              <CheckCircle className="w-12 h-12" />
-            </div>
-            <h2 className="text-3xl font-bold text-healthcare-dark mb-2">Analysis Complete</h2>
-            <p className="text-slate-500 mb-8">We've identified your arrhythmia type based on the ECG image.</p>
-            
-            <div className="bg-slate-50 rounded-3xl p-8 mb-8 text-left space-y-6">
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <div className="text-sm text-slate-400 font-medium mb-1 uppercase tracking-wider">Classification</div>
-                  <div className="text-3xl font-bold text-healthcare-blue">{result.prediction}</div>
+            {/* Report Header */}
+            <div className="bg-[#F9FAFB] p-8 border-b border-[#E5E7EB] flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div>
+                <div className="flex items-center gap-2 text-[#E8A26A] font-bold text-[9px] uppercase tracking-widest mb-3">
+                  <ShieldCheck size={14} /> Official Analysis Report
                 </div>
-                <div>
-                  <div className="text-sm text-slate-400 font-medium mb-1 uppercase tracking-wider">Confidence Score</div>
-                  <div className="text-3xl font-bold text-healthcare-dark">{(result.confidence * 100).toFixed(2)}%</div>
+                <h2 className="text-2xl font-bold text-[#111111] tracking-tight">Diagnostic Summary</h2>
+              </div>
+              <div className="text-right">
+                <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Report ID</div>
+                <div className="text-[10px] font-bold text-[#111111] font-mono">{result.id.slice(-12).toUpperCase()}</div>
+              </div>
+            </div>
+
+            <div className="p-8 space-y-10">
+              {/* Main Results Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
+                  <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Neural Classification</div>
+                  <div className={`text-3xl font-bold tracking-tight ${result.prediction === 'Normal' ? 'text-[#111111]' : 'text-red-500'}`}>
+                    {result.prediction}
+                  </div>
+                </div>
+                <div className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
+                  <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Confidence Index</div>
+                  <div className="text-3xl font-bold text-[#111111] tracking-tight">
+                    {(result.confidence * 100).toFixed(1)}%
+                  </div>
                 </div>
               </div>
 
-              {result.breakdown && result.breakdown.length > 0 && (
-                <div>
-                  <div className="text-sm text-slate-400 font-bold mb-4 uppercase tracking-wider flex items-center gap-2">
-                    <Activity className="w-4 h-4" /> Beat Type Distribution
-                  </div>
-                  <div className="space-y-3">
-                    {result.breakdown.map((item, idx) => {
-                      const isNormal = item.label.toLowerCase().includes('normal');
-                      
-                      // Color mapping: Green for normal, various shades of red/orange/purple for risk
-                      const barColor = isNormal ? 'bg-green-500' : 
-                                      (idx === 0 ? 'bg-red-600' : 
-                                      (idx === 1 ? 'bg-orange-500' : 
-                                      (idx === 2 ? 'bg-red-400' : 'bg-slate-400')));
-                      
-                      const textColor = isNormal ? 'text-green-600' : 
-                                       (idx === 0 ? 'text-red-600' : 
-                                       (idx === 1 ? 'text-orange-600' : 
-                                       (idx === 2 ? 'text-red-500' : 'text-slate-500')));
-
-                      return (
-                        <div key={idx} className="flex items-center gap-3">
-                          <div className="w-28 text-xs font-semibold text-slate-600 truncate flex-shrink-0">{item.label}</div>
-                          <div className="flex-1 bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-700 ${barColor}`}
-                              style={{ width: `${Math.min(item.percentage, 100)}%` }}
-                            />
-                          </div>
-                          <div className={`text-xs font-bold w-12 text-right ${textColor}`}>
-                            {item.percentage.toFixed(1)}%
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Clinical Guidance Section */}
-                  {(() => {
-                    const totalRisk = result.breakdown
-                      .filter(item => !item.label.toLowerCase().includes('normal'))
-                      .reduce((sum, item) => sum + item.percentage, 0);
-                    
-                    if (totalRisk < 5) return null;
-
-                    const isHigh = totalRisk > 15; // Threshold for high as per user's "19% included" hint
-                    const isModerate = totalRisk >= 5 && totalRisk <= 15;
-
-                    return (
-                      <div className={`mt-8 p-5 rounded-2xl border ${isHigh ? 'bg-red-50 border-red-100 text-red-800' : 'bg-orange-50 border-orange-100 text-orange-800'}`}>
-                        <div className="flex items-center gap-2 font-bold mb-2">
-                          <AlertCircle size={20} className={isHigh ? 'text-red-600' : 'text-orange-600'} />
-                          {isHigh ? 'High (Abnormal) Risk' : 'Moderate Risk Level'}
-                        </div>
-                        <p className="text-sm leading-relaxed opacity-90">
-                          {isHigh 
-                            ? `Your total abnormal beat frequency is ${totalRisk.toFixed(1)}%. This level usually requires medical follow-up and clinical correlation.` 
-                            : `Your total abnormal beat frequency is ${totalRisk.toFixed(1)}%. May require an initial checkup to ensure heart structure is okay.`
-                          }
-                        </p>
-                      </div>
-                    );
-                  })()}
+              {/* Informatics Table */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-[#F3F4F6] pb-3">
+                  <h3 className="text-[9px] font-bold text-[#111111] uppercase tracking-widest">Informatics Distribution</h3>
                 </div>
-              )}
-            </div>
+                
+                <div className="grid gap-4">
+                  {result.breakdown && result.breakdown.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-6">
+                      <div className="w-24 text-[9px] font-bold text-[#111111] uppercase tracking-widest truncate">
+                        {item.label}
+                      </div>
+                      <div className="flex-1 h-1 bg-[#F3F4F6] rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${item.percentage}%` }}
+                          transition={{ duration: 1.5, ease: "circOut" }}
+                          className={`h-full ${item.label.toLowerCase().includes('normal') ? 'bg-[#111111]' : 'bg-[#E8A26A]'}`}
+                        />
+                      </div>
+                      <div className="w-12 text-right text-[9px] font-bold text-[#111111] tabular-nums">
+                        {(item.percentage).toFixed(1)}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => navigate('/dashboard')}
-                className="btn-secondary px-8 flex-1 sm:flex-none"
-              >
-                Go to Dashboard
-              </button>
-              <button 
-                onClick={() => handleView(result.id)}
-                className="btn-primary px-6 flex items-center justify-center gap-2 flex-1 sm:flex-none"
-              >
-                <Eye className="w-5 h-5" /> View Report
-              </button>
-              <button 
-                onClick={() => handleDownload(result.id)}
-                className="btn-primary px-6 flex items-center justify-center gap-2 flex-1 sm:flex-none"
-              >
-                <Download className="w-5 h-5" /> Download
-              </button>
+              {/* Report Actions */}
+              <div className="pt-8 border-t border-[#F3F4F6] flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={() => handleView(result.id)}
+                  className="flex-1 btn-primary-dark !py-4 flex items-center justify-center gap-3 text-xs"
+                >
+                  <Eye size={16} /> Clinical PDF Report
+                </button>
+                <button 
+                  onClick={() => handleDownload(result.id)}
+                  className="flex-1 btn-outline-dark !py-4 flex items-center justify-center gap-3 text-xs"
+                >
+                  <Download size={16} /> Download Data
+                </button>
+              </div>
             </div>
-            <button 
-              onClick={reset}
-              className="mt-6 text-sm text-slate-400 hover:text-healthcare-blue transition-colors underline"
-            >
-              Run another analysis
-            </button>
           </motion.div>
         )}
+
+        {/* Requirements Section */}
+        <div className="bg-white p-8 rounded-[1.5rem] border border-[#E5E7EB]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div>
+              <h3 className="text-[10px] font-bold text-[#111111] uppercase tracking-[0.2em] mb-1">Analysis Requirements</h3>
+              <p className="text-[11px] text-[#6B7280] font-medium">Criteria for optimal neural classification accuracy.</p>
+            </div>
+            <div className="flex flex-wrap gap-6">
+              <RequirementItem label="Clear Trace" />
+              <RequirementItem label="Low Noise" />
+              <RequirementItem label="High Contrast" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+const RequirementItem = ({ label }) => (
+  <div className="flex items-center gap-2.5">
+    <CheckCircle size={14} className="text-[#111111]" />
+    <span className="text-[9px] font-bold text-[#111111] uppercase tracking-widest">{label}</span>
+  </div>
+);
 
 export default UploadPage;

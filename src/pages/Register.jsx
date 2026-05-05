@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Lock, UserPlus, AlertCircle, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Activity, User, Mail, Lock, ChevronDown, ArrowRight } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'patient',
-    age: '',
-    gender: 'male'
+    role: 'patient'
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,138 +28,138 @@ const Register = () => {
       await register(formData);
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      setError(err.response?.data?.detail || 'Registration failed.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center mt-2 px-4 bg-healthcare-light pt-20 pb-6">
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-[#F8FAFC] relative overflow-hidden">
+      {/* Home Link - Top Left */}
+      <Link to="/" className="absolute top-8 left-8 z-20 flex items-center gap-3 text-[#111111] hover:text-[#6B7280] transition-colors group">
+        <div className="w-10 h-10 bg-white border border-[#E5E7EB] flex items-center justify-center rounded-xl shadow-sm group-hover:border-[#111111] transition-all">
+          <Activity className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Portal Home</span>
+      </Link>
+
+      {/* Background Accents */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#E8A26A]/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#111111]/5 rounded-full blur-[120px]" />
+      </div>
+
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl w-full"
+        transition={{ duration: 0.5 }}
+        className="max-w-[700px] w-full relative z-10"
       >
-        <div className="glass-card p-6 sm:p-8">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-healthcare-dark">Create Account</h2>
-            <p className="text-slate-500 text-sm mt-1">Join our AI-powered healthcare platform</p>
+        <div className="bg-white p-10 md:p-14 border border-[#E5E7EB] shadow-2xl rounded-[2rem]">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-[#111111] tracking-tight mb-2">Clinical Registry</h2>
+            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">Initialize your professional profile</p>
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3 text-xs">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-600 text-[10px] font-bold uppercase tracking-wider rounded-r-xl"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input 
-                  type="text" 
-                  name="name"
-                  required
-                  className="input-field py-2.5 pl-12 text-sm" 
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Full Identity Name</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
+                  <input 
+                    type="text" 
+                    name="name"
+                    required
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] py-3.5 pl-12 pr-6 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] focus:bg-white transition-all rounded-xl" 
+                    placeholder="e.g. Dr. Jane Smith"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="group">
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Clinical Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
+                  <input 
+                    type="email" 
+                    name="email"
+                    required
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] py-3.5 pl-12 pr-6 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] focus:bg-white transition-all rounded-xl" 
+                    placeholder="name@clinical.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input 
-                  type="email" 
-                  name="email"
-                  required
-                  className="input-field py-2.5 pl-12 text-sm" 
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Secure Pass-Key</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
+                  <input 
+                    type="password" 
+                    name="password"
+                    required
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] py-3.5 pl-12 pr-6 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] focus:bg-white transition-all rounded-xl" 
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="group">
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Access Role</label>
+                <div className="relative">
+                  <select 
+                    name="role"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] py-3.5 px-6 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] focus:bg-white transition-all rounded-xl appearance-none"
+                    value={formData.role}
+                    onChange={handleChange}
+                  >
+                    <option value="patient">General Patient</option>
+                    <option value="doctor">Medical Specialist</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input 
-                  type="password" 
-                  name="password"
-                  required
-                  className="input-field py-2.5 pl-12 text-sm" 
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Role</label>
-              <select 
-                name="role"
-                className="input-field py-2.5 text-sm"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="patient">Patient</option>
-                <option value="doctor">Doctor</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Age</label>
-              <input 
-                type="number" 
-                name="age"
-                className="input-field py-2.5 text-sm"
-                placeholder="25"
-                value={formData.age}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
-              <select 
-                name="gender"
-                className="input-field py-2.5 text-sm"
-                value={formData.gender}
-                onChange={handleChange}
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2 flex justify-center">
+            <div className="pt-6">
               <button 
                 type="submit" 
                 disabled={loading}
-                className="btn-primary w-fit max-w-xs py-3 flex items-center justify-center gap-2 mt-2 text-base"
+                className="bg-[#111111] text-white w-full py-5 rounded-xl text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl shadow-black/10 active:scale-[0.98]"
               >
-                {loading ? 'Creating Account...' : <><UserPlus className="w-5 h-5" /> Create Account</>}
+                {loading ? "Processing..." : "Create Account"} <ArrowRight size={16} />
               </button>
             </div>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-500">
-            Already have an account? <Link to="/login" className="text-healthcare-blue font-semibold hover:underline">Sign In</Link>
+          <div className="mt-10 text-center">
+            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">
+              Already registered? <Link to="/login" className="text-[#111111] hover:underline underline-offset-8 decoration-2 transition-all font-bold">Sign In Here</Link>
+            </p>
           </div>
         </div>
       </motion.div>
     </div>
-
   );
 };
 

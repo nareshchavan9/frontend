@@ -12,7 +12,8 @@ import {
   Trash2, 
   Edit3,
   X,
-  Check
+  Check,
+  ChevronLeft
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -50,7 +51,6 @@ const GlobalHistoryPage = () => {
   };
 
   const startEdit = (item) => {
-    // Parse name from notes if possible
     let name = item.patient_name || '';
     let age = '';
     let gender = 'male';
@@ -77,7 +77,7 @@ const GlobalHistoryPage = () => {
 
       await api.put(`/predict/${editingId}`, formData);
       setEditingId(null);
-      fetchHistory(); // Refresh
+      fetchHistory();
     } catch (err) {
       alert('Failed to update record');
     }
@@ -109,102 +109,105 @@ const GlobalHistoryPage = () => {
   };
 
   return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/doctor')} className="p-2 hover:bg-slate-100 rounded-xl">
-            <ArrowLeft size={24} />
-          </button>
-          <div>
-            <h1 className="text-3xl font-bold text-healthcare-dark flex items-center gap-2">
-              <History className="text-healthcare-blue" /> Global Clinical History
-            </h1>
-            <p className="text-slate-500">Manage all clinical analyses and patient metadata</p>
-          </div>
-        </div>
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5] relative">
+      {/* Top Right Search Bar - Absolute Positioning */}
+      <div className="absolute top-24 right-6 lg:right-10 w-full md:w-72 z-20">
+        <div className="relative">
+          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
           <input 
             type="text" 
-            className="input-field pl-10" 
-            placeholder="Search by patient name..." 
+            className="w-full pl-12 pr-6 py-2.5 bg-white border border-[#E5E7EB] rounded-xl focus:border-[#111111] outline-none text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm" 
+            placeholder="Search activity records..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
+      {/* Editorial Header - Centered */}
+      <div className="flex flex-col items-center text-center mb-16 mt-16 md:mt-0 gap-4">
+        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
+          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+          Global Clinical Feed
+        </div>
+        <h1 className="text-4xl font-bold text-[#111111] tracking-tight mb-2">Recent Activity</h1>
+        <p className="text-[#6B7280] text-base font-medium max-w-lg leading-relaxed">
+          Comprehensive log of all diagnostic evaluations and patient telemetry across the clinical hub.
+        </p>
+      </div>
+
       <div className="space-y-4">
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {filteredAnalyses.map((item) => (
             <motion.div 
               key={item._id}
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-card p-5 border border-slate-100 hover:shadow-lg transition-all"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white p-6 rounded-[1.5rem] border border-[#E5E7EB] hover:border-[#111111] transition-all shadow-sm group"
             >
               {editingId === item._id ? (
-                <form onSubmit={handleUpdate} className="flex flex-wrap gap-4 items-end">
+                <form onSubmit={handleUpdate} className="flex flex-wrap gap-6 items-end">
                   <div className="flex-1 min-w-[200px]">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Patient Name</label>
+                    <label className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 block">Patient Name</label>
                     <input 
                       type="text" 
-                      className="input-field py-2" 
+                      className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-2 text-sm font-medium outline-none focus:border-[#111111]" 
                       value={editForm.name}
                       onChange={(e) => setEditForm({...editForm, name: e.target.value})}
                     />
                   </div>
                   <div className="w-24">
-                    <label className="text-xs font-bold text-slate-400 uppercase">Age</label>
+                    <label className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 block">Age</label>
                     <input 
                       type="number" 
-                      className="input-field py-2" 
+                      className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-2 text-sm font-medium outline-none focus:border-[#111111]" 
                       value={editForm.age}
                       onChange={(e) => setEditForm({...editForm, age: e.target.value})}
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button type="submit" className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-                      <Check size={20} />
+                    <button type="submit" className="w-10 h-10 bg-[#111111] text-white rounded-lg flex items-center justify-center hover:bg-black transition-all">
+                      <Check size={18} />
                     </button>
-                    <button type="button" onClick={() => setEditingId(null)} className="p-2 bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300">
-                      <X size={20} />
+                    <button type="button" onClick={() => setEditingId(null)} className="w-10 h-10 bg-[#F3F4F6] text-[#111111] rounded-lg flex items-center justify-center hover:bg-[#E5E7EB] transition-all">
+                      <X size={18} />
                     </button>
                   </div>
                 </form>
               ) : (
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-5 w-full md:w-auto">
-                    <div className={`p-4 rounded-2xl ${item.prediction === 'Normal' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                      <Activity size={28} />
+                  <div className="flex items-center gap-6 w-full md:w-auto">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.prediction === 'Normal' ? 'bg-[#F3F4F6] text-[#111111]' : 'bg-red-50 text-red-500'} group-hover:bg-[#111111] group-hover:text-white transition-all`}>
+                      <Activity size={20} />
                     </div>
                     <div>
-                      <div className="font-bold text-lg text-healthcare-dark">{item.patient_name || "Unknown Patient"}</div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
-                          <Clock size={14} /> {new Date(item.timestamp).toLocaleDateString()}
+                      <div className="text-lg font-bold text-[#111111] leading-tight mb-1">{item.patient_name || "Unknown Profile"}</div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[9px] font-bold text-[#6B7280] flex items-center gap-1 uppercase tracking-widest">
+                          <Clock size={12} /> {new Date(item.timestamp).toLocaleDateString()}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${item.prediction === 'Normal' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <span className={`text-[8px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${item.prediction === 'Normal' ? 'border-[#E5E7EB] text-[#111111]' : 'border-red-100 text-red-500 bg-red-50'}`}>
                           {item.prediction}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <button onClick={() => handleView(item._id)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-healthcare-blue/10 hover:text-healthcare-blue transition-all" title="View">
-                      <Eye size={18} />
+                  <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+                    <button onClick={() => handleView(item._id)} className="w-10 h-10 bg-white border border-[#E5E7EB] text-[#111111] rounded-xl flex items-center justify-center hover:bg-[#111111] hover:text-white transition-all" title="View Report">
+                      <Eye size={16} />
                     </button>
-                    <button onClick={() => handleDownload(item._id)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-healthcare-blue/10 hover:text-healthcare-blue transition-all" title="Download">
-                      <Download size={18} />
+                    <button onClick={() => handleDownload(item._id)} className="w-10 h-10 bg-[#111111] text-white rounded-xl flex items-center justify-center hover:bg-black transition-all" title="Download PDF">
+                      <Download size={16} />
                     </button>
-                    <div className="w-px h-8 bg-slate-100 mx-1"></div>
-                    <button onClick={() => startEdit(item)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-orange-50 hover:text-orange-600 transition-all" title="Edit Metadata">
-                      <Edit3 size={18} />
+                    <div className="w-[1px] h-6 bg-[#E5E7EB] mx-2"></div>
+                    <button onClick={() => startEdit(item)} className="w-10 h-10 bg-white border border-[#E5E7EB] text-[#6B7280] rounded-xl flex items-center justify-center hover:border-orange-500 hover:text-orange-500 transition-all" title="Edit Clinical Metadata">
+                      <Edit3 size={16} />
                     </button>
-                    <button onClick={() => handleDelete(item._id)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all" title="Delete Record">
-                      <Trash2 size={18} />
+                    <button onClick={() => handleDelete(item._id)} className="w-10 h-10 bg-white border border-[#E5E7EB] text-[#6B7280] rounded-xl flex items-center justify-center hover:border-red-500 hover:text-red-500 transition-all" title="Delete Record">
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,51 +6,63 @@
 
 @layer base {
   body {
-    @apply bg-healthcare-light text-slate-800 font-sans;
+    @apply bg-[#F5F5F5] text-[#111111] font-sans antialiased m-0 p-0 overflow-x-hidden;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-['Outfit'] font-semibold tracking-tight;
+    @apply font-sans font-bold tracking-tight text-[#111111];
+  }
+
+  :root {
+    --primary: #111111;
+    --secondary: #6B7280;
+    --border: #E5E7EB;
+    --surface: #FFFFFF;
+    --accent: #E8A26A;
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-premium rounded-2xl;
+  .premium-job-card {
+    @apply bg-[#FFFFFF] p-8 rounded-[1.25rem] border border-[#E5E7EB] shadow-sm transition-all duration-300 hover:shadow-xl flex flex-col;
   }
   
-  .btn-primary {
-    @apply bg-healthcare-blue text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50;
-  }
-  
-  .btn-secondary {
-    @apply bg-white text-healthcare-blue border border-healthcare-blue/20 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:bg-healthcare-blue/5 hover:shadow-md active:scale-[0.98];
+  .badge-tag {
+    @apply px-4 py-1.5 bg-[#F3F4F6] text-[#6B7280] text-xs font-bold rounded-xl transition-colors hover:bg-slate-200;
   }
 
-  .nav-link {
-    @apply text-slate-600 hover:text-healthcare-blue font-medium transition-colors duration-200;
+  .btn-primary-dark {
+    @apply bg-[#111111] text-[#FFFFFF] px-8 py-4 rounded-[1rem] font-bold text-sm transition-all active:scale-95 hover:bg-[#222222] shadow-lg shadow-black/5;
   }
 
-  .nav-link-active {
-    @apply text-healthcare-blue;
+  .btn-outline-dark {
+    @apply bg-[#FFFFFF] text-[#111111] border border-[#111111] px-8 py-4 rounded-[1rem] font-bold text-sm transition-all active:scale-95 hover:bg-[#F9F9F9];
   }
 
-  .input-field {
-    @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-healthcare-blue/20 focus:border-healthcare-blue outline-none transition-all duration-200;
+  .input-standard {
+    @apply bg-[#F3F4F6] border border-transparent py-4 px-6 outline-none text-[#111111] font-medium text-sm focus:border-[#111111] focus:bg-[#FFFFFF] transition-all rounded-[1rem];
+  }
+
+  .badge-accent {
+    @apply px-3 py-1 bg-[#E8A26A] text-white text-[10px] font-black uppercase tracking-widest rounded-full;
   }
 }
 
-/* Custom Animations */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-[#F5F5F5];
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-[#E5E7EB] rounded-full border-4 border-transparent bg-clip-padding;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[#D1D5DB];
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-healthcare-blue to-healthcare-teal;
+/* Global Transitions */
+* {
+  @apply transition-[background-color,border-color,color] duration-200;
 }

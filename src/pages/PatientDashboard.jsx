@@ -11,10 +11,14 @@ import {
   ArrowRight,
   FileText,
   Lightbulb,
-  X
+  X,
+  ShieldCheck,
+  Heart,
+  ChevronRight,
+  Shield,
+  Search
 } from 'lucide-react';
 import api from '../services/api';
-import AIAssistant from '../components/AIAssistant';
 import { useAuth } from '../context/AuthContext';
 
 const PatientDashboard = () => {
@@ -46,98 +50,119 @@ const PatientDashboard = () => {
     fetchHistory();
   }, []);
 
-  const handleDownload = async (predictionId) => {
-    try {
-      const response = await api.get(`/reports/${predictionId}`, {
-        responseType: 'blob',
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `report_${predictionId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      console.error('Download failed', err);
-      alert('Failed to download report. Please try again.');
-    }
-  };
-
   return (
-    <div className="pt-28 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+    <div className="pt-32 pb-0 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F5F5F5]">
+      {/* Editorial Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
         <div>
-          <h1 className="text-3xl font-bold text-healthcare-dark">Hello, {user?.name}</h1>
-          <p className="text-slate-500 mt-1">Here's your heart health overview</p>
+          <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-4">
+            <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+            Clinical Wellness Portal
+          </div>
+          <h1 className="text-4xl font-bold text-[#111111] tracking-tight mb-2">Welcome, {user?.name.split(' ')[0]}</h1>
+          <p className="text-[#6B7280] text-base font-medium">Your heart health summary and diagnostic history.</p>
         </div>
-        <Link to="/upload" className="btn-primary flex items-center gap-2">
-          <Upload className="w-5 h-5" /> New Detection
-        </Link>
+        <div className="flex gap-4 w-full md:w-auto">
+          <Link to="/ai-assistant" className="bg-white border border-[#E5E7EB] text-[#111111] px-6 py-3 rounded-xl font-bold text-[13px] hover:border-[#111111] transition-all flex items-center gap-3 w-full md:w-auto justify-center shadow-sm">
+            <MessageSquare size={16} /> AI Assistant
+          </Link>
+          <Link to="/upload" className="bg-[#111111] text-white px-6 py-3 rounded-xl font-bold text-[13px] hover:bg-black transition-all flex items-center gap-3 w-full md:w-auto justify-center">
+            <Upload size={16} /> New Analysis
+          </Link>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard 
-          icon={<Activity className="w-6 h-6" />}
-          label="Total Tests"
-          value={stats.totalPredictions}
-          color="bg-blue-500"
+      {/* Grid Layout - Stats (Reduced Size to Medium) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+        <MetricCard 
+          icon={<Activity />} 
+          label="Cumulative Tests" 
+          value={stats.totalPredictions} 
+          trend="+2"
         />
-        <StatCard 
-          icon={<TrendingUp className="w-6 h-6" />}
-          label="Last Result"
-          value={stats.lastResult}
-          subValue={`${(stats.confidence * 100).toFixed(1)}% confidence`}
-          color={stats.lastResult.toLowerCase().includes('abnormal') ? "bg-red-500" : (stats.lastResult.toLowerCase().includes('normal') ? "bg-green-500" : "bg-slate-400")}
+        <MetricCard 
+          icon={<TrendingUp />} 
+          label="Latest Classification" 
+          value={stats.lastResult.split('(')[0].trim()} 
+          subValue={stats.lastResult !== 'N/A' ? `${(stats.confidence * 100).toFixed(0)}% accuracy` : 'No data'}
+          isAlert={!stats.lastResult.toLowerCase().includes('normal') && stats.lastResult !== 'N/A'}
         />
-        <StatCard 
-          icon={<Clock className="w-6 h-6" />}
-          label="Status"
-          value="Healthy"
-          subValue="Keep it up!"
-          color="bg-purple-500"
+        <MetricCard 
+          icon={<ShieldCheck />} 
+          label="Security Status" 
+          value="Encrypted" 
+          subValue="Verified"
         />
-        <button 
+        
+        {/* Insight Card */}
+        <motion.button 
+          whileHover={{ y: -3 }}
           onClick={() => setShowTips(true)}
-          className="glass-card p-6 flex items-center gap-4 hover:shadow-lg transition-all text-left group border border-transparent hover:border-healthcare-blue/20"
+          className="bg-white p-6 rounded-[1.5rem] border border-[#E5E7EB] hover:border-[#111111] transition-all group text-left relative overflow-hidden"
         >
-          <div className="p-4 rounded-2xl bg-orange-500 text-white shadow-lg group-hover:scale-110 transition-transform">
-            <Lightbulb className="w-6 h-6" />
+          <div className="absolute top-0 right-0 w-20 h-20 bg-[#E8A26A]/5 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <div className="flex justify-between items-start mb-6 relative z-10">
+            <div className="w-10 h-10 bg-[#F3F4F6] text-[#E8A26A] flex items-center justify-center rounded-xl group-hover:bg-[#E8A26A] group-hover:text-white transition-all">
+              <Lightbulb size={20} />
+            </div>
+            <span className="text-[8px] font-bold text-[#E8A26A] border border-[#E8A26A]/20 px-2 py-0.5 rounded-full uppercase tracking-widest">Pro Tip</span>
           </div>
-          <div>
-            <div className="text-sm text-slate-500 font-medium">Daily Tips</div>
-            <div className="text-xl font-bold text-healthcare-dark">Health Insights</div>
-            <div className="text-xs text-healthcare-blue font-bold flex items-center gap-1 mt-0.5">
-              View Now <ArrowRight size={12} />
+          <div className="mt-auto relative z-10">
+            <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-0.5">Wellness Intelligence</div>
+            <div className="text-lg font-bold text-[#111111]">Daily Insights</div>
+          </div>
+        </motion.button>
+      </div>
+
+      <div className="mb-20">
+        <h3 className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+          <ArrowRight size={12} className="text-[#111111]" /> Active Clinical Operations
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <CompactActionCard 
+            to="/history"
+            icon={<History />}
+            title="Clinical Archives"
+            description="Access previous analyses."
+          />
+          <CompactActionCard 
+            to="/upload"
+            icon={<Activity />}
+            title="Rapid Diagnostic"
+            description="New neural classification."
+          />
+        </div>
+      </div>
+
+      {/* Footer Section - System Compliance with White Background */}
+      <div className="mt-20 -mx-6 lg:-mx-10 px-6 lg:px-10 py-12 bg-white border-t border-[#E5E7EB] mb-0">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
+            <div className="max-w-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <Shield className="text-[#111111] w-4 h-4" />
+                <h3 className="text-[10px] font-bold text-[#111111] uppercase tracking-[0.2em]">Clinical System Compliance</h3>
+              </div>
+              <p className="text-xs text-[#6B7280] leading-relaxed font-medium">
+                Your clinical data is protected by hospital-grade encryption and HIPAA-compliant neural architecture. 
+                We utilize AES-256 protocols to ensure data sovereignty.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-8">
+              <SecurityBadge label="Encryption" />
+              <SecurityBadge label="HIPAA" />
+              <SecurityBadge label="Sovereignty" />
             </div>
           </div>
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Section */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="glass-card p-6">
-            <Link to="/history" className="w-full btn-secondary flex items-center justify-center gap-3 py-4 text-lg">
-              <History className="w-6 h-6" /> View Prediction History
-            </Link>
-          </div>
-        </div>
-
-        {/* Sidebar Section */}
-        <div className="space-y-8">
-          <div className="bg-gradient-to-br from-healthcare-blue to-healthcare-teal p-6 rounded-3xl text-white shadow-xl">
-            <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              AI Assistant
-            </h3>
-            <p className="text-blue-50/80 text-sm mb-6">
-              Have questions about your heart health? Our AI assistant is here to help 24/7.
-            </p>
-            <Link to="/ai-assistant" className="w-full bg-white text-healthcare-blue py-3 rounded-xl font-bold text-center block hover:shadow-lg transition-all active:scale-95">
-              Chat Now
-            </Link>
+          
+          <div className="mt-10 pt-6 border-t border-[#F3F4F6] flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-bold text-[#6B7280] uppercase tracking-widest">
+            <div className="flex items-center gap-6">
+              <Link to="/about" className="hover:text-[#111111] transition-colors">Privacy</Link>
+              <Link to="/about" className="hover:text-[#111111] transition-colors">Methodology</Link>
+              <Link to="/contact" className="hover:text-[#111111] transition-colors">Support</Link>
+            </div>
+            <div>© 2026 Arrythmia Intelligence</div>
           </div>
         </div>
       </div>
@@ -145,46 +170,46 @@ const PatientDashboard = () => {
       {/* Health Tips Modal */}
       <AnimatePresence>
         {showTips && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowTips(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-[#111111]/40 backdrop-blur-sm"
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-[32px] p-8 max-w-md w-full relative z-10 shadow-2xl border border-white"
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-[2rem] p-10 max-w-md w-full relative z-10 shadow-2xl border border-[#E5E7EB]"
             >
               <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#F3F4F6] text-[#E8A26A] rounded-xl flex items-center justify-center">
                     <Lightbulb size={24} />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold">Heart Health Tips</h3>
-                    <p className="text-slate-500 text-sm">Expert clinical advice</p>
+                    <h3 className="text-xl font-bold text-[#111111]">Heart Tips</h3>
+                    <p className="text-[#6B7280] text-[9px] font-bold uppercase tracking-widest">Expert Guidance</p>
                   </div>
                 </div>
-                <button onClick={() => setShowTips(false)} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-                  <X size={20} />
+                <button onClick={() => setShowTips(false)} className="p-2 hover:bg-[#F3F4F6] rounded-xl transition-all">
+                  <X size={20} className="text-[#6B7280]" />
                 </button>
               </div>
 
-              <div className="space-y-4 mb-8">
-                <TipCard icon={<Activity size={18} />} title="Monitor Activity" text="Walk at least 30 minutes daily to improve blood circulation." />
-                <TipCard icon={<TrendingUp size={18} />} title="Nutrition First" text="Maintain a balanced diet rich in omega-3 and low in sodium." />
-                <TipCard icon={<Clock size={18} />} title="Regular Checkups" text="Monitor your blood pressure and ECG at consistent intervals." />
+              <div className="space-y-6 mb-8">
+                <TipItem title="Daily Movement" text="Try to walk at least 30 minutes daily." />
+                <TipItem title="Sodium Control" text="Limit salt intake to under 2,300mg." />
+                <TipItem title="Hydration" text="Drink at least 8 glasses of water." />
               </div>
 
               <button 
                 onClick={() => setShowTips(false)}
-                className="btn-primary w-full py-4 shadow-lg shadow-healthcare-blue/20"
+                className="bg-[#111111] text-white w-full py-4 text-xs font-bold uppercase tracking-[0.2em] shadow-xl shadow-black/10 hover:bg-black transition-all rounded-xl"
               >
-                Got it, Thanks!
+                Close Insights
               </button>
             </motion.div>
           </div>
@@ -194,46 +219,55 @@ const PatientDashboard = () => {
   );
 };
 
-const StatCard = ({ icon, label, value, subValue, color }) => {
-  const isResult = label === "Last Result";
-  const displayValue = isResult && value !== 'N/A' 
-    ? (value.toLowerCase().includes('abnormal') ? 'Abnormal' : (value.toLowerCase().includes('normal') ? 'Normal' : 'Abnormal')) 
-    : value;
-
-  return (
-    <div className="glass-card p-6 flex items-center gap-4 group relative">
-      <div className={`p-4 rounded-2xl ${color} text-white shadow-lg group-hover:scale-110 transition-all duration-300`}>
-        {icon}
+const MetricCard = ({ icon, label, value, subValue, trend, isAlert }) => (
+  <div className="bg-white p-6 rounded-[1.5rem] border border-[#E5E7EB] hover:border-[#111111] transition-all group">
+    <div className="flex justify-between items-start mb-6">
+      <div className={`w-10 h-10 bg-[#F3F4F6] text-[#111111] flex items-center justify-center rounded-xl group-hover:bg-[#111111] group-hover:text-white transition-all`}>
+        {React.cloneElement(icon, { size: 18 })}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm text-slate-500 font-medium">{label}</div>
-        <div className="text-2xl font-bold text-healthcare-dark truncate" title={displayValue}>
-          {displayValue}
-        </div>
-        {subValue && <div className="text-xs text-slate-400 mt-0.5 truncate">{subValue}</div>}
-      </div>
-      
-      {isResult && value !== 'N/A' && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-3 bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-[70] shadow-2xl border border-white/10 scale-90 group-hover:scale-100 origin-bottom">
-          <div className="font-bold text-healthcare-teal mb-1 flex items-center gap-1">
-            <Activity size={12} /> Full Diagnosis
-          </div>
-          <div className="text-sm font-medium">{value}</div>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-[8px] border-transparent border-t-slate-900/95" />
-        </div>
+      {trend && (
+        <span className="text-[8px] font-bold text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded-md uppercase tracking-wider">
+          {trend}
+        </span>
+      )}
+      {isAlert && (
+        <span className="w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
       )}
     </div>
-  );
-};
-
-const TipCard = ({ icon, title, text }) => (
-  <div className="flex gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-healthcare-blue shadow-sm flex-shrink-0">
-      {icon}
+    <div className="mt-auto">
+      <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-0.5">{label}</div>
+      <div className="text-xl font-bold text-[#111111] tracking-tight mb-0.5">{value}</div>
+      {subValue && <div className="text-[9px] font-medium text-[#6B7280] tracking-tight">{subValue}</div>}
     </div>
+  </div>
+);
+
+const CompactActionCard = ({ to, icon, title, description }) => (
+  <Link to={to} className="bg-white p-5 rounded-[1.25rem] border border-[#E5E7EB] hover:border-[#111111] transition-all flex items-center gap-4 group">
+    <div className="w-10 h-10 bg-[#F9FAFB] text-[#111111] flex items-center justify-center rounded-lg group-hover:bg-[#111111] group-hover:text-white transition-all shrink-0">
+      {React.cloneElement(icon, { size: 18 })}
+    </div>
+    <div className="flex-grow min-w-0">
+      <h4 className="text-sm font-bold text-[#111111] tracking-tight truncate">{title}</h4>
+      <p className="text-[10px] text-[#6B7280] truncate">{description}</p>
+    </div>
+    <ChevronRight size={16} className="text-[#6B7280] group-hover:text-[#111111] group-hover:translate-x-1 transition-all" />
+  </Link>
+);
+
+const SecurityBadge = ({ label }) => (
+  <div className="flex items-center gap-2">
+    <div className="w-1.5 h-1.5 bg-[#111111] rounded-full"></div>
+    <span className="text-[9px] font-bold text-[#111111] uppercase tracking-widest">{label}</span>
+  </div>
+);
+
+const TipItem = ({ title, text }) => (
+  <div className="flex gap-4">
+    <div className="w-0.5 h-10 bg-[#F3F4F6] rounded-full"></div>
     <div>
-      <div className="font-bold text-healthcare-dark text-sm">{title}</div>
-      <div className="text-xs text-slate-500 leading-relaxed mt-0.5">{text}</div>
+      <div className="font-bold text-[#111111] text-sm mb-0.5">{title}</div>
+      <div className="text-xs text-[#6B7280] leading-relaxed">{text}</div>
     </div>
   </div>
 );

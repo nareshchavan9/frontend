@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, FileText, Download, Activity, Calendar, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, FileText, Download, Activity, Calendar, Eye, ChevronDown, ChevronUp, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const HistoryPage = () => {
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,13 +34,11 @@ const HistoryPage = () => {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `report_${predictionId}.pdf`);
-      document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Download failed', err);
-      alert('Failed to download report. Please try again.');
     }
   };
 
@@ -52,7 +52,6 @@ const HistoryPage = () => {
       window.open(fileURL);
     } catch (err) {
       console.error('View failed', err);
-      alert('Failed to view report. Please try again.');
     }
   };
 
@@ -61,95 +60,101 @@ const HistoryPage = () => {
   );
 
   return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-healthcare-dark">Prediction History</h1>
-          <p className="text-slate-500 mt-1">Review and manage your past ECG analyses</p>
+    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5]">
+      {/* Editorial Header - Centered */}
+      <div className="flex flex-col items-center text-center mb-10 gap-3">
+        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
+          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+          Clinical Diagnostic Registry
+          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
         </div>
-        
-        <div className="flex gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input 
-              type="text" 
-              placeholder="Search by diagnosis..." 
-              className="pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-healthcare-blue/20 focus:border-healthcare-blue outline-none w-full md:w-64"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-slate-600">
-            <Filter className="w-5 h-5" />
-          </button>
-        </div>
+        <h1 className="text-3xl lg:text-4xl font-bold text-[#111111] tracking-tight mb-2">Diagnostic History</h1>
+        <p className="text-[#6B7280] text-base font-medium max-w-lg">A comprehensive registry of your heart health evaluations and neural reports.</p>
       </div>
 
-      <div className="glass-card overflow-hidden">
+      {/* Filters Area - Centered and Compact */}
+      <div className="max-w-2xl mx-auto mb-8 flex flex-col sm:flex-row gap-4 items-center">
+        <div className="relative w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] w-4 h-4" />
+          <input 
+            type="text" 
+            placeholder="Search evaluations..." 
+            className="w-full pl-12 pr-6 py-3.5 bg-white border border-[#E5E7EB] rounded-xl focus:border-[#111111] outline-none text-xs font-bold uppercase tracking-widest transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <button className="p-3.5 bg-white border border-[#E5E7EB] rounded-xl hover:border-[#111111] transition-all text-[#111111]">
+          <Filter className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="bg-white border border-[#E5E7EB] rounded-[2rem] overflow-hidden shadow-xl">
         {loading ? (
-          <div className="p-20 flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-healthcare-blue"></div>
+          <div className="p-32 flex flex-col items-center justify-center gap-4">
+            <div className="w-10 h-10 border-2 border-[#111111] border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-[10px] font-bold text-[#111111] uppercase tracking-widest">Synchronizing Archive...</span>
           </div>
         ) : filteredHistory.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-6 py-5 text-sm font-bold text-slate-600 uppercase tracking-wider">Diagnosis</th>
-                  <th className="px-6 py-5 text-sm font-bold text-slate-600 uppercase tracking-wider">Confidence</th>
-                  <th className="px-6 py-5 text-sm font-bold text-slate-600 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-5 text-sm font-bold text-slate-600 uppercase tracking-wider text-right">Action</th>
+                <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
+                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Diagnostic Outcome</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Precision Index</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Registered Date</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#F3F4F6]">
                 {filteredHistory.slice(0, visibleCount).map((item, index) => (
                   <motion.tr 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     key={item._id} 
-                    className="hover:bg-slate-50/50 transition-colors group"
+                    className="hover:bg-[#F9FAFB]/50 transition-colors group"
                   >
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${item.prediction.toLowerCase().includes('normal') ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                          <Activity className="w-5 h-5" />
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-9 h-9 rounded-lg border border-[#E5E7EB] flex items-center justify-center ${item.prediction.toLowerCase().includes('normal') ? 'text-[#111111]' : 'text-red-500'}`}>
+                          <Activity size={16} />
                         </div>
-                        <span className="font-semibold text-slate-800">{item.prediction}</span>
+                        <span className="text-sm font-bold text-[#111111] tracking-tight">{item.prediction}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-32 h-1 bg-[#F3F4F6] rounded-full overflow-hidden shrink-0">
                           <div 
-                            className={`h-full ${item.confidence > 0.9 ? 'bg-green-500' : 'bg-yellow-500'}`} 
+                            className={`h-full ${item.confidence > 0.9 ? 'bg-[#111111]' : 'bg-[#E8A26A]'}`} 
                             style={{ width: `${item.confidence * 100}%` }}
                           />
                         </div>
-                        <span className="text-sm font-medium text-slate-600">{(item.confidence * 100).toFixed(1)}%</span>
+                        <span className="text-[10px] font-bold text-[#111111] tracking-widest tabular-nums">{(item.confidence * 100).toFixed(1)}%</span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-sm text-slate-500">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(item.timestamp).toLocaleDateString()}
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">
+                        <Calendar size={14} />
+                        {new Date(item.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-right">
+                    <td className="px-8 py-5 text-right">
                       <div className="flex justify-end gap-2">
                         <button 
                           onClick={() => handleView(item._id)}
-                          className="p-2 bg-healthcare-blue/5 text-healthcare-blue rounded-lg hover:bg-healthcare-blue/10 transition-colors"
+                          className="w-8 h-8 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#111111] hover:text-white transition-all flex items-center justify-center"
                           title="View Report"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye size={14} />
                         </button>
                         <button 
                           onClick={() => handleDownload(item._id)}
-                          className="p-2 bg-healthcare-blue/5 text-healthcare-blue rounded-lg hover:bg-healthcare-blue/10 transition-colors"
-                          title="Download Report"
+                          className="w-8 h-8 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#111111] hover:text-white transition-all flex items-center justify-center"
+                          title="Download PDF"
                         >
-                          <Download className="w-4 h-4" />
+                          <Download size={14} />
                         </button>
                       </div>
                     </td>
@@ -159,28 +164,28 @@ const HistoryPage = () => {
             </table>
           </div>
         ) : (
-          <div className="p-20 text-center text-slate-400">
-            No history records found.
+          <div className="p-32 text-center">
+            <div className="text-[#6B7280] mb-2 font-bold uppercase tracking-[0.2em] text-[10px]">Registry Empty</div>
+            <p className="text-[#6B7280] text-[10px] font-medium">No diagnostic records match your search.</p>
           </div>
         )}
       </div>
 
       {filteredHistory.length > 5 && (
-        <div className="flex items-center justify-center gap-4 mt-8">
-          {visibleCount < filteredHistory.length && (
+        <div className="flex items-center justify-center gap-6 mt-12">
+          {visibleCount < filteredHistory.length ? (
             <button 
               onClick={() => setVisibleCount(prev => prev + 5)}
-              className="flex items-center gap-2 px-6 py-3 bg-healthcare-blue text-white rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95"
+              className="bg-[#111111] text-white px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-3"
             >
-              Show More <ChevronDown size={18} />
+              Load Additional <ChevronDown size={14} />
             </button>
-          )}
-          {visibleCount > 5 && (
+          ) : (
             <button 
               onClick={() => setVisibleCount(5)}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-slate-600 border border-slate-200 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
+              className="border border-[#E5E7EB] text-[#111111] px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#F9FAFB] transition-all flex items-center gap-3"
             >
-              Show Less <ChevronUp size={18} />
+              Collapse Archive <ChevronUp size={14} />
             </button>
           )}
         </div>

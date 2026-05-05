@@ -10,7 +10,9 @@ import {
   Download,
   Users,
   Clipboard,
-  Clock
+  Clock,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -64,156 +66,114 @@ const DoctorSearchPage = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const q = new URLSearchParams(location.search).get('q');
+    if (q !== null) setSearchTerm(q);
+  }, [location.search]);
+
   const filteredPatients = patients.filter(p => 
     (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (p.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
-  const filteredAnalyses = analyses.filter(a => 
-    (a.patient_name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  );
-
-  const handleDownload = async (predictionId) => {
-    try {
-      const response = await api.get(`/reports/${predictionId}`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `report_${predictionId}.pdf`);
-      link.click();
-    } catch (err) { console.error('Download failed', err); }
-  };
-
-  const handleView = async (predictionId) => {
-    try {
-      const response = await api.get(`/reports/${predictionId}`, { responseType: 'blob' });
-      const file = new Blob([response.data], { type: 'application/pdf' });
-      window.open(URL.createObjectURL(file));
-    } catch (err) { console.error('View failed', err); }
-  };
-
   return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen bg-slate-50/30">
-      {/* Search Header */}
-      <div className="mb-12">
-        <button 
-          onClick={() => navigate('/doctor')}
-          className="flex items-center gap-2 text-slate-500 hover:text-healthcare-blue font-bold transition-colors mb-6"
-        >
-          <ArrowLeft size={20} /> Back to Dashboard
-        </button>
-        
-        <div className="max-w-3xl">
-          <h1 className="text-4xl font-extrabold text-healthcare-dark mb-4 tracking-tight">Global Clinical Search</h1>
-          <p className="text-slate-500 mb-8">Search across all registered patients and diagnostic analysis history.</p>
-          
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-healthcare-blue transition-colors">
-              <Search size={24} />
-            </div>
-            <input 
-              type="text" 
-              autoFocus
-              className="w-full bg-white border-2 border-slate-100 rounded-[2rem] py-5 pl-14 pr-6 outline-none focus:border-healthcare-blue focus:shadow-2xl focus:shadow-healthcare-blue/10 transition-all text-xl font-medium shadow-sm"
-              placeholder="Enter patient name, email, or record ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F5F5F5] relative">
+      {/* Top Right Search Bar - Absolute Positioning */}
+      <div className="absolute top-24 right-6 lg:right-10 w-full md:w-72 z-20">
+        <div className="relative">
+          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
+          <input 
+            type="text" 
+            className="w-full pl-12 pr-6 py-2.5 bg-white border border-[#E5E7EB] rounded-xl focus:border-[#111111] outline-none text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm" 
+            placeholder="Search by name, email or ID..." 
+            value={searchTerm}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSearchTerm(val);
+              navigate(`/doctor/search?q=${encodeURIComponent(val)}`, { replace: true });
+            }}
+          />
         </div>
+      </div>
+
+      {/* Editorial Header - Centered */}
+      <div className="flex flex-col items-center text-center mb-16 mt-16 md:mt-0 gap-4">
+        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
+          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+          Clinical Intelligence Hub
+        </div>
+        <h1 className="text-4xl font-bold text-[#111111] tracking-tight mb-2">Patient Registry</h1>
+        <p className="text-[#6B7280] text-base font-medium max-w-lg leading-relaxed">
+          Centralized database of all patient profiles and longitudinal medical archives.
+        </p>
       </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-10 h-10 border-4 border-healthcare-blue border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Accessing Records...</p>
+          <div className="w-12 h-12 border-2 border-[#111111]/10 border-t-[#111111] rounded-full animate-spin mb-4" />
+          <p className="text-[#6B7280] font-bold uppercase tracking-widest text-[10px]">Accessing Registry...</p>
         </div>
       ) : (
-        <div className="space-y-16">
-          {searchTerm && (
-            <>
-              {/* Patient Results */}
-              {filteredPatients.length > 0 ? (
-                <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 text-healthcare-blue rounded-lg">
-                        <Users size={20} />
+        <div className="space-y-12">
+          {filteredPatients.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <AnimatePresence mode="popLayout">
+                {filteredPatients.map((p, i) => (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: i * 0.05 }}
+                    key={p._id} 
+                    className="bg-white p-6 rounded-[2rem] border border-[#E5E7EB] hover:border-[#111111] transition-all group flex flex-col shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="w-10 h-10 bg-[#F3F4F6] text-[#111111] rounded-xl flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all">
+                        <Users size={18} />
                       </div>
-                      <h2 className="text-xl font-bold text-healthcare-dark">Matching Clinical Records ({filteredPatients.length})</h2>
+                      <span className="text-[8px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border border-[#E5E7EB]">
+                        {p.type}
+                      </span>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredPatients.map(p => (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        key={p._id} 
-                        className="glass-card overflow-hidden hover:shadow-2xl transition-all border border-slate-100 group flex flex-col"
-                      >
-                        {/* Header Highlight */}
-                        <div className={`h-2 w-full ${p.type === 'self' ? 'bg-healthcare-blue' : 'bg-teal-500'}`} />
-                        
-                        <div className="p-8 flex-1 flex flex-col">
-                          <div className="flex items-center justify-between mb-6">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${p.type === 'self' ? 'bg-blue-100 text-blue-700' : 'bg-teal-100 text-teal-700'}`}>
-                              {p.type === 'self' ? 'Patient App User' : 'Clinical Record'}
-                            </span>
-                            <span className="text-xs text-slate-300 font-mono">ID: {p._id.slice(-8)}</span>
-                          </div>
 
-                          <h3 className="text-2xl font-black text-healthcare-dark mb-1 group-hover:text-healthcare-blue transition-colors">{p.name}</h3>
-                          <p className="text-sm text-slate-400 mb-6 font-medium">{p.email}</p>
+                    <div className="mb-8 flex-1">
+                      <h3 className="text-lg font-bold text-[#111111] leading-tight mb-1 truncate">{p.name}</h3>
+                      <p className="text-[10px] text-[#6B7280] font-medium truncate mb-6">{p.email}</p>
 
-                          {/* Demographic Details - Matching the Profile View */}
-                          <div className="grid grid-cols-2 gap-4 mb-8">
-                            <div className="bg-slate-50 p-3 rounded-2xl">
-                              <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Age</div>
-                              <div className="text-lg font-bold text-healthcare-dark">{p.age || 'N/A'} <span className="text-xs font-medium text-slate-400">Years</span></div>
-                            </div>
-                            <div className="bg-slate-50 p-3 rounded-2xl">
-                              <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Gender</div>
-                              <div className="text-lg font-bold text-healthcare-dark">{(p.gender || 'Unknown').charAt(0).toUpperCase()}{(p.gender || 'Unknown').slice(1)}</div>
-                            </div>
-                            <div className="bg-blue-50/50 p-3 rounded-2xl border border-blue-100/50 col-span-2">
-                              <div className="text-[10px] font-bold text-healthcare-blue uppercase mb-1">Total Clinical Analyses</div>
-                              <div className="text-xl font-black text-healthcare-blue">{p.testCount} <span className="text-xs font-bold text-blue-400 tracking-normal ml-1">Records Found</span></div>
-                            </div>
-                          </div>
-
-                          <div className="mt-auto pt-6 border-t border-slate-100">
-                            <button 
-                              onClick={() => navigate(`/doctor/patient/${p._id}`)}
-                              className="w-full py-4 bg-healthcare-dark text-white font-bold rounded-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200 active:scale-95"
-                            >
-                              View Full Medical Profile <ArrowUpRight size={18} />
-                            </button>
-                          </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-[#F9FAFB] p-3 rounded-2xl border border-[#F3F4F6]">
+                          <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Age</div>
+                          <div className="text-sm font-bold text-[#111111]">{p.age || '??'}Y</div>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
-                  <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Search size={40} className="text-slate-300" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-healthcare-dark">No records found</h3>
-                  <p className="text-slate-400 mt-2">We couldn't find any patient matching "{searchTerm}"</p>
-                </div>
-              )}
-            </>
-          )}
+                        <div className="bg-[#F9FAFB] p-3 rounded-2xl border border-[#F3F4F6]">
+                          <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Gender</div>
+                          <div className="text-sm font-bold text-[#111111]">{(p.gender || 'U').charAt(0).toUpperCase()}</div>
+                        </div>
+                      </div>
+                    </div>
 
-          {!searchTerm && (
-            <div className="text-center py-32">
-              <div className="w-20 h-20 bg-blue-50 text-healthcare-blue rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Search size={32} />
-              </div>
-              <h2 className="text-2xl font-bold text-healthcare-dark">Start Typing to Search</h2>
-              <p className="text-slate-400 mt-2">Enter patient clinical metadata to begin investigation.</p>
+                    <div className="pt-6 border-t border-[#F3F4F6] flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest">Analyses</span>
+                        <span className="text-lg font-black text-[#111111]">{p.testCount}</span>
+                      </div>
+                      <button 
+                        onClick={() => navigate(`/doctor/patient/${p._id}`)}
+                        className="w-10 h-10 bg-[#111111] text-white rounded-xl flex items-center justify-center hover:bg-black transition-all shadow-lg shadow-black/10"
+                      >
+                        <ChevronRight size={18} />
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="text-center py-32 bg-white rounded-[3rem] border border-[#E5E7EB] border-dashed">
+              <Search size={32} className="mx-auto text-[#6B7280] mb-4 opacity-20" />
+              <h3 className="text-lg font-bold text-[#111111]">No Clinical Matches</h3>
+              <p className="text-[10px] text-[#6B7280] font-bold uppercase tracking-widest mt-2">Try adjusting your search criteria</p>
             </div>
           )}
         </div>

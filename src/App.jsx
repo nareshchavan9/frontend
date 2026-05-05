@@ -13,24 +13,38 @@ import DoctorSearchPage from './pages/DoctorSearchPage';
 import DoctorAnalysisPage from './pages/DoctorAnalysisPage';
 import PatientHistoryPage from './pages/PatientHistoryPage';
 import GlobalHistoryPage from './pages/GlobalHistoryPage';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AIHealthAssistant from './pages/AIHealthAssistant';
+import Contact from './pages/Contact';
+
 
 const AppRoutes = () => {
   const location = useLocation();
+  const isAuthPage = ['/login', '/register', '/forgot-password'].includes(location.pathname);
   const isAIPath = location.pathname === '/ai-assistant';
 
   return (
     <>
-      {!isAIPath && <Navbar />}
+      {!isAIPath && !isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } 
+        />
         
         {/* Patient Routes */}
         <Route 

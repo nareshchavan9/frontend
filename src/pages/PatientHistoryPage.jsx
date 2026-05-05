@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, 
   Clock, 
@@ -11,7 +11,15 @@ import {
   Calendar,
   Eye,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft,
+  Shield,
+  Clipboard,
+  TrendingUp,
+  UserCheck,
+  ChevronDown,
+  ChevronUp,
+  Plus
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -22,11 +30,11 @@ const PatientHistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [patientName, setPatientName] = useState('Patient');
   const [patientData, setPatientData] = useState(null);
+  const [showAllRecords, setShowAllRecords] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        // 1. Fetch Patient Profile to get accurate demographics
         const patientsRes = await api.get('/reports/admin/patients');
         const profile = patientsRes.data.find(p => p._id === patientId);
         
@@ -35,25 +43,24 @@ const PatientHistoryPage = () => {
           setPatientName(profile.name);
         }
 
-        // 2. Use the new Unified History Endpoint
-        // This handles registered users (by ID) and clinical patients (by ID/Name)
         const response = await api.get(`/predict/history/unified/${patientId}`);
         
         if (response.data.length > 0) {
           setHistory(response.data);
           
-          // If we didn't find a profile in registered users, try to construct from first history item
           if (!profile) {
             const first = response.data[0];
-            const name = first.patient_name || first.notes?.match(/Patient:\s*([^|]+)/)?.[1]?.strip() || 'Patient';
+            const name = first.patient_name || 'Clinical Profile';
             setPatientName(name);
             
             const ageMatch = first.notes?.match(/Age:\s*(\d+)/);
             const genderMatch = first.notes?.match(/Gender:\s*(\w+)/);
             setPatientData({
               name: name,
-              age: ageMatch ? ageMatch[1] : "",
-              gender: genderMatch ? genderMatch[1] : "male"
+              age: ageMatch ? ageMatch[1] : "??",
+              gender: genderMatch ? genderMatch[1] : "Unknown",
+              email: "N/A (Clinical)",
+              type: "clinical"
             });
           }
         }
@@ -68,189 +75,230 @@ const PatientHistoryPage = () => {
 
   const handleDownload = async (predictionId) => {
     try {
-      const response = await api.get(`/reports/${predictionId}`, {
-        responseType: 'blob',
-      });
+      const response = await api.get(`/reports/${predictionId}`, { responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `report_${predictionId}.pdf`);
-      document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Download failed', err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const handleView = async (predictionId) => {
     try {
-      const response = await api.get(`/reports/${predictionId}`, {
-        responseType: 'blob',
-      });
+      const response = await api.get(`/reports/${predictionId}`, { responseType: 'blob' });
       const file = new Blob([response.data], { type: 'application/pdf' });
-      const fileURL = URL.createObjectURL(file);
-      window.open(fileURL);
-    } catch (err) {
-      console.error('View failed', err);
-    }
+      window.open(URL.createObjectURL(file));
+    } catch (err) { console.error(err); }
   };
 
-  return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <button 
-        onClick={() => navigate('/doctor')}
-        className="flex items-center gap-2 text-slate-500 hover:text-healthcare-blue transition-colors mb-8 group"
-      >
-        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-        Back to Dashboard
-      </button>
+  if (loading) {
+    return (
+      <div className="pt-28 flex justify-center items-center h-screen bg-[#F5F5F5]">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-10 h-10 border-2 border-[#111111]/10 border-t-[#111111] rounded-full animate-spin"></div>
+          <p className="text-[#6B7280] font-bold tracking-widest uppercase text-[9px]">Retrieving Medical History...</p>
+        </div>
+      </div>
+    );
+  }
 
-      <div className="flex items-center justify-between mb-10">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-healthcare-blue text-white rounded-2xl flex items-center justify-center shadow-lg">
-            <User size={32} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-healthcare-dark">{patientName}</h1>
-            <p className="text-slate-500">Comprehensive timeline for patient records</p>
+  const visibleHistory = showAllRecords ? history : history.slice(0, 3);
+
+  return (
+    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1200px] mx-auto min-h-screen bg-[#F5F5F5]">
+      {/* Top Action Bar - Compact */}
+      <div className="flex items-center justify-between mb-8">
+        <button 
+          onClick={() => navigate('/doctor/search')} 
+          className="flex items-center gap-2 text-[#111111] font-bold text-[9px] uppercase tracking-widest hover:translate-x-[-2px] transition-all bg-white px-4 py-2 rounded-lg border border-[#E5E7EB]"
+        >
+          <ChevronLeft size={14} /> Registry
+        </button>
+
+        <button 
+          onClick={() => {
+            navigate('/doctor/analyze', { 
+              state: { 
+                prefill: { 
+                  id: patientId,
+                  name: patientData?.name || patientName, 
+                  age: patientData?.age || "", 
+                  gender: (patientData?.gender || "male").toLowerCase()
+                } 
+              } 
+            });
+          }}
+          className="bg-[#111111] text-white px-5 py-2.5 rounded-lg font-bold text-[9px] uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-sm"
+        >
+          <Plus size={14} /> New Analysis
+        </button>
+      </div>
+
+      {/* Row 1: Profile Card & Longitudinal Analysis Beside Each Other - Compact */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-10">
+        {/* Profile Identity Card - Compact */}
+        <div className="bg-white p-6 rounded-[1.5rem] border border-[#E5E7EB] shadow-sm relative overflow-hidden h-full">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#F9FAFB] rounded-bl-[4rem] -z-0 opacity-50"></div>
+          <div className="relative z-10 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-6">
+              <div className="w-12 h-12 bg-[#111111] text-white rounded-xl flex items-center justify-center shadow-lg">
+                <User size={20} />
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-[8px] font-bold text-[#6B7280] border border-[#E5E7EB] px-2.5 py-1 rounded-full uppercase tracking-widest mb-1.5">
+                  {patientData?.type || 'Record'}
+                </span>
+                <span className="text-[8px] font-bold text-[#111111] uppercase tracking-widest opacity-20">ID: {patientId.slice(-6)}</span>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-[#111111] tracking-tight mb-1">{patientName}</h1>
+              <p className="text-[#6B7280] text-[10px] font-bold uppercase tracking-widest truncate max-w-[200px]">{patientData?.email}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-auto">
+              <div className="bg-[#F9FAFB] p-3 rounded-xl border border-[#F3F4F6]">
+                <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest mb-0.5">Age</div>
+                <div className="text-lg font-bold text-[#111111]">{patientData?.age || '??'} <span className="text-[9px] font-medium opacity-30 uppercase ml-1">Yrs</span></div>
+              </div>
+              <div className="bg-[#F9FAFB] p-3 rounded-xl border border-[#F3F4F6]">
+                <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest mb-0.5">Gender</div>
+                <div className="text-lg font-bold text-[#111111]">{(patientData?.gender || 'U').charAt(0).toUpperCase()}</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-6">
-          <button 
-            onClick={() => {
-              navigate('/doctor/analyze', { 
-                state: { 
-                  prefill: { 
-                    id: patientId,
-                    name: patientData?.name || patientName, 
-                    age: patientData?.age || "", 
-                    gender: (patientData?.gender || "male").toLowerCase()
-                  } 
-                } 
-              });
-            }}
-            className="btn-primary flex items-center gap-2 shadow-lg shadow-healthcare-blue/20"
-          >
-            <Activity size={20} /> Perform New Analysis
-          </button>
-          <div className="hidden sm:block text-right">
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Tests</div>
-            <div className="text-2xl font-bold text-healthcare-blue">{history.length}</div>
+
+        {/* Longitudinal Trend Chart - Compact */}
+        <div className="bg-[#111111] p-6 rounded-[1.5rem] text-white shadow-xl relative overflow-hidden h-full">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 blur-3xl rounded-full"></div>
+          <div className="relative z-10 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
+                <TrendingUp size={12} className="text-orange-400" /> Stability Index
+              </h3>
+              <div className="px-2 py-0.5 rounded-full border border-white/10 text-[7px] font-bold text-white/40 uppercase tracking-widest">v4.2</div>
+            </div>
+            
+            <div className="flex justify-between items-end h-24 gap-2 mb-6 relative px-2">
+              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/10 w-full"></div>
+              
+              {history.length > 0 ? (
+                [...history].reverse().slice(-5).map((item, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-2 group relative h-full justify-end">
+                    <motion.div 
+                      initial={{ height: 0 }}
+                      animate={{ height: `${Math.max((item.confidence * 100), 10)}%` }}
+                      className={`w-full rounded-t-md transition-all duration-300 relative ${item.prediction === 'Normal' ? 'bg-white/20 group-hover:bg-white' : 'bg-red-500/40 group-hover:bg-red-500'}`}
+                    >
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity bg-white text-black px-1.5 py-0.5 rounded shadow-lg">
+                        {(item.confidence * 100).toFixed(0)}%
+                      </div>
+                    </motion.div>
+                    <div className="text-[7px] font-bold opacity-30 uppercase tracking-tighter text-center">
+                      {new Date(item.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[9px] text-white/20 font-bold uppercase tracking-widest italic">
+                  No Data
+                </div>
+              )}
+            </div>
+            <div className="mt-auto flex items-center justify-between text-[8px] font-bold text-white/30 uppercase tracking-widest pt-4 border-t border-white/5">
+              <span>Telemetry Map</span>
+              <span className="text-white/60">{history.length} EVALS</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Clinical Progression Track */}
-      {history.length > 1 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-6 mb-12 border border-blue-50 bg-gradient-to-r from-white to-blue-50/30"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-black text-healthcare-dark uppercase tracking-widest flex items-center gap-2">
-              <Activity size={16} className="text-healthcare-blue" /> Diagnostic Progression Track
-            </h3>
-            <span className="text-xs font-bold text-slate-400">Last {Math.min(history.length, 5)} Test Trends</span>
-          </div>
-          
-          <div className="flex items-center justify-between relative px-4">
-            {/* Connection Line */}
-            <div className="absolute top-1/2 left-10 right-10 h-0.5 bg-slate-100 -translate-y-1/2 -z-10" />
-            
-            {[...history].reverse().slice(-5).map((item, idx) => (
-              <div key={item._id} className="flex flex-col items-center gap-3 relative">
-                <div className={`w-10 h-10 rounded-full border-4 border-white shadow-md flex items-center justify-center transition-all hover:scale-110 ${item.prediction.toLowerCase().includes('normal') ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                  {item.prediction.toLowerCase().includes('normal') ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                </div>
-                <div className="text-center">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">{new Date(item.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                  <div className={`text-[10px] font-black uppercase ${item.prediction.toLowerCase().includes('normal') ? 'text-green-600' : 'text-red-600'}`}>{item.prediction}</div>
-                </div>
-                {idx === Math.min(history.length, 5) - 1 && (
-                  <div className="absolute -top-6 bg-healthcare-blue text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter animate-bounce">Latest</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-
+      {/* Row 2: Diagnostic Records Spanning Full Width - Compact Cards */}
       <div className="space-y-6">
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="animate-spin w-10 h-10 border-4 border-healthcare-blue border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading history...</p>
-          </div>
-        ) : history.length > 0 ? (
-          history.map((item, index) => (
-            <motion.div 
-              key={item._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="glass-card p-6 flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-100 hover:border-healthcare-blue/30 transition-all"
-            >
-              <div className="flex items-center gap-6 w-full md:w-auto">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.prediction.toLowerCase().includes('normal') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                  <Activity size={28} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${item.prediction.toLowerCase().includes('normal') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {item.prediction}
-                    </span>
-                    <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
-                      <Calendar size={12} /> {new Date(item.timestamp).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="text-lg font-bold text-healthcare-dark">
-                    ECG Classification Result
-                  </div>
-                  <div className="flex items-center gap-4 mt-1">
-                    <div className="text-sm text-slate-500 flex items-center gap-1">
-                      <Clock size={14} /> Recorded at {new Date(item.timestamp).toLocaleTimeString()}
-                    </div>
-                    <div className="text-xs font-bold text-healthcare-blue bg-blue-50 px-2 py-0.5 rounded-md">
-                      {item.doctor_name || "Self-Tested"}
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+          <h2 className="text-[9px] font-bold text-[#111111] uppercase tracking-[0.2em] flex items-center gap-2">
+            <Clipboard size={12} /> Clinical Timeline
+          </h2>
+        </div>
 
-              <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0">
-                <div className="text-center mr-4 hidden lg:block">
-                  <div className="text-xs font-bold text-slate-400 uppercase mb-1">Confidence</div>
-                  <div className="text-xl font-bold text-healthcare-dark">{(item.confidence * 100).toFixed(1)}%</div>
+        <div className="grid grid-cols-1 gap-3">
+          <AnimatePresence mode="popLayout">
+            {visibleHistory.map((item, i) => (
+              <motion.div 
+                key={item._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white p-5 rounded-2xl border border-[#E5E7EB] hover:border-[#111111] transition-all group flex flex-col sm:flex-row items-center justify-between gap-5 shadow-sm"
+              >
+                <div className="flex items-center gap-5 flex-1">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${item.prediction === 'Normal' ? 'bg-[#F3F4F6] text-[#111111]' : 'bg-red-50 text-red-500'} group-hover:bg-[#111111] group-hover:text-white transition-all`}>
+                    <Activity size={18} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[7px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${item.prediction === 'Normal' ? 'border-[#E5E7EB] text-[#111111]' : 'border-red-100 text-red-500 bg-red-50'}`}>
+                        {item.prediction}
+                      </span>
+                      <span className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest flex items-center gap-1">
+                        <Clock size={10} /> {new Date(item.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h4 className="text-base font-bold text-[#111111] mb-0.5">Evaluation Report</h4>
+                    <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest">
+                      {item.doctor_name || "Automated System"}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <button 
-                    onClick={() => handleView(item._id)}
-                    className="btn-secondary flex-1 flex items-center justify-center gap-2 py-2 px-4 text-sm"
-                  >
-                    <Eye size={16} /> View
-                  </button>
-                  <button 
-                    onClick={() => handleDownload(item._id)}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2 py-2 px-4 text-sm"
-                  >
-                    <Download size={16} /> Download
-                  </button>
+
+                <div className="flex items-center gap-5 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0">
+                  <div className="text-right mr-4">
+                    <div className="text-[7px] font-bold text-[#6B7280] uppercase tracking-widest mb-0.5">Confidence</div>
+                    <div className="text-lg font-black text-[#111111]">{(item.confidence * 100).toFixed(0)}%</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleView(item._id)}
+                      className="w-9 h-9 bg-white border border-[#E5E7EB] text-[#111111] rounded-lg flex items-center justify-center hover:bg-[#111111] hover:text-white transition-all shadow-sm"
+                    >
+                      <Eye size={14} />
+                    </button>
+                    <button 
+                      onClick={() => handleDownload(item._id)}
+                      className="w-9 h-9 bg-[#111111] text-white rounded-lg flex items-center justify-center hover:bg-black transition-all shadow-sm"
+                    >
+                      <Download size={14} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <div className="text-center py-20 glass-card bg-slate-50/50 border-dashed border-2 border-slate-200">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
-              <Activity size={32} />
-            </div>
-            <h3 className="text-xl font-bold text-slate-400">No History Found</h3>
-            <p className="text-slate-400 mt-2">This patient has no recorded ECG analyses yet.</p>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          <div className="flex justify-center gap-4 mt-6">
+            {!showAllRecords && history.length > 3 && (
+              <button 
+                onClick={() => setShowAllRecords(true)}
+                className="w-auto px-10 py-3 bg-white border border-[#E5E7EB] text-[#111111] rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] hover:border-[#111111] transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                Expand Medical Archives <ChevronDown size={14} />
+              </button>
+            )}
+            {showAllRecords && history.length > 3 && (
+              <button 
+                onClick={() => setShowAllRecords(false)}
+                className="w-auto px-10 py-3 bg-white border border-[#E5E7EB] text-[#111111] rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] hover:border-[#111111] transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                Compress Timeline <ChevronUp size={14} />
+              </button>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

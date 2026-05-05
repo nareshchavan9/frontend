@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Activity, Lock, Mail } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -17,64 +17,86 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      const data = await login(email, password);
-      if (data.role === 'admin') navigate('/admin');
-      else if (data.role === 'doctor') navigate('/doctor');
-      else navigate('/dashboard');
+      const response = await login(email, password);
+      // Determine redirect path based on role
+      const userRole = response?.user?.role || response?.role;
+      if (userRole === 'doctor' || userRole === 'admin') {
+        navigate('/doctor');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to login. Please check your credentials.');
+      setError(err.response?.data?.detail || 'Identity verification failed.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen mt-8 flex items-center justify-center px-4 bg-healthcare-light">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#F8FAFC] relative overflow-hidden">
+      {/* Home Link - Top Left */}
+      <Link to="/" className="absolute top-8 left-8 z-20 flex items-center gap-3 text-[#111111] hover:text-[#6B7280] transition-colors group">
+        <div className="w-10 h-10 bg-white border border-[#E5E7EB] flex items-center justify-center rounded-xl shadow-sm group-hover:border-[#111111] transition-all">
+          <Activity className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Portal Home</span>
+      </Link>
+
+      {/* Background Accents */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#E8A26A]/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#111111]/5 rounded-full blur-[120px]" />
+      </div>
+
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full"
+        initial={{ opacity: 0, scale: 0.98, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-[460px] w-full relative z-10"
       >
-        <div className="glass-card p-8 sm:p-10">
+        <div className="bg-white p-10 md:p-14 border border-[#E5E7EB] shadow-2xl rounded-[2.5rem]">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-healthcare-dark">Welcome Back</h2>
-            <p className="text-slate-500 mt-2">Log in to manage your heart health</p>
+            <h2 className="text-3xl font-bold text-[#111111] tracking-tight mb-2">Welcome Back</h2>
+            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">Continue with your clinical credentials</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3 text-sm">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-600 text-[10px] font-bold uppercase tracking-wider rounded-r-xl"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+            <div className="group">
+              <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest mb-3 ml-1">Clinical Email</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
                 <input 
                   type="email" 
                   required
-                  className="input-field pl-12" 
-                  placeholder="name@example.com"
+                  className="w-full bg-[#F9FAFB] border border-[#E5E7EB] py-4 pl-14 pr-6 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] focus:bg-white transition-all rounded-2xl placeholder:text-slate-300" 
+                  placeholder="name@clinical.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="text-sm font-semibold text-slate-700">Password</label>
-                <Link to="/forgot-password" className="text-sm text-healthcare-blue hover:underline">Forgot?</Link>
+            <div className="group">
+              <div className="flex justify-between items-center mb-3 ml-1">
+                <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest">Pass-Key</label>
+                <Link to="/forgot-password" size="sm" className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest hover:text-[#111111] transition-colors">Forgot?</Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
                 <input 
                   type="password" 
                   required
-                  className="input-field pl-12" 
+                  className="w-full bg-[#F9FAFB] border border-[#E5E7EB] py-4 pl-14 pr-6 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] focus:bg-white transition-all rounded-2xl placeholder:text-slate-300" 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -82,19 +104,24 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex items-center gap-3 pt-2 ml-1">
+              <input type="checkbox" className="w-4 h-4 rounded border-[#E5E7EB] text-[#111111] focus:ring-[#111111]" />
+              <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Remember this session</span>
+            </div>
+
+            <div className="pt-4">
               <button 
                 type="submit" 
                 disabled={loading}
-                className="btn-primary w-fit max-w-xs flex items-center justify-center gap-2"
+                className="bg-[#111111] text-white w-full py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-black transition-all flex items-center justify-center gap-3 shadow-2xl shadow-black/10 rounded-2xl active:scale-[0.98]"
               >
-                {loading ? 'Logging in...' : <><LogIn className="w-5 h-5" /> Sign In</>}
+                {loading ? "Authenticating..." : "Establish Secure Access"}
               </button>
             </div>
           </form>
 
-          <div className="mt-8 text-center text-slate-500">
-            Don't have an account? <Link to="/register" className="text-healthcare-blue font-semibold hover:underline">Create one</Link>
+          <div className="mt-12 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B7280]">
+            No account? <Link to="/register" className="text-[#111111] font-bold hover:underline underline-offset-8 transition-all">Request access</Link>
           </div>
         </div>
       </motion.div>

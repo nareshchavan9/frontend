@@ -1,90 +1,116 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Shield, Zap, Activity, Users, ArrowRight } from 'lucide-react';
+import { Shield, Zap, Activity, Users, ArrowRight, TrendingUp, ChevronRight } from 'lucide-react';
 
 const Home = () => {
   return (
-    <div className="pt-32 pb-20 overflow-hidden">
+    <div className="pt-20 overflow-hidden bg-[#F5F5F5]">
       {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+      <section className="relative px-6 lg:px-10 py-10 lg:py-16 min-h-[70vh] flex items-center">
+        <div className="max-w-[1280px] mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+          
           <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex-1 text-center lg:text-left"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-healthcare-blue/10 text-healthcare-blue rounded-full mb-6">
-              <Activity className="w-4 h-4" />
-              <span className="text-sm font-semibold tracking-wide">AI-POWERED HEART HEALTH</span>
+            <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[9px] uppercase tracking-widest mb-5">
+              <span className="w-5 h-[1px] bg-[#E5E7EB]"></span>
+              Next-Gen Medical Intelligence
             </div>
-            <h1 className="text-5xl lg:text-7xl font-['Outfit'] font-bold text-healthcare-dark leading-tight mb-8">
-              Detect Arrhythmia with <span className="gradient-text">AI Precision</span>
+            
+            <h1 className="text-4xl lg:text-6xl font-bold text-[#111111] leading-[1] mb-6 tracking-tighter">
+              Precision <br />
+              Arrhythmia <br />
+              <span className="text-[#6B7280]">Portal.</span>
             </h1>
-            <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto lg:mx-0">
-              Upload your ECG images and get instant, accurate classifications powered by deep learning. A professional tool for patients and healthcare providers.
+            
+            <p className="text-base text-[#6B7280] mb-8 max-w-sm leading-relaxed font-medium">
+              Advanced neural classification system designed for clinical professionals. 
+              Empowering healthcare with accurate, real-time heart health intelligence.
             </p>
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-              <Link to="/register" className="btn-primary flex items-center gap-2 text-lg px-8 py-4">
-                Start Detection <ArrowRight className="w-5 h-5" />
+            
+            <div className="flex flex-wrap gap-4">
+              <Link to="/register" className="bg-[#111111] text-white px-7 py-3 rounded-xl font-bold text-[13px] transition-all hover:bg-black flex items-center gap-3 group">
+                Enter Portal <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/about" className="btn-secondary text-lg px-8 py-4">
-                Learn More
+              <Link to="/about" className="border border-[#111111] text-[#111111] px-7 py-3 rounded-xl font-bold text-[13px] transition-all hover:bg-slate-50">
+                Methodology
               </Link>
+            </div>
+            
+            <div className="mt-10 flex items-center gap-8">
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-[#111111]">98.5%</span>
+                <span className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest">Accuracy</span>
+              </div>
+              <div className="w-[1px] h-6 bg-[#E5E7EB]"></div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-[#111111]">2k+</span>
+                <span className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest">Specialists</span>
+              </div>
             </div>
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
-            className="flex-1 relative"
+            className="relative flex justify-center lg:justify-end"
           >
-            <div className="absolute inset-0 bg-healthcare-blue/20 blur-[100px] rounded-full"></div>
-            <div className="glass-card p-4 relative z-10 animate-float">
-              <img 
-                src="https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=1000&auto=format&fit=crop" 
-                alt="ECG Analysis" 
-                className="rounded-xl shadow-2xl w-full h-auto object-cover"
-              />
-              <div className="absolute -bottom-6 -left-6 glass-card p-6 flex items-center gap-4 border-l-4 border-l-healthcare-blue">
-                <div className="bg-healthcare-blue/10 p-3 rounded-full text-healthcare-blue">
-                  <Shield className="w-8 h-8" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">98.5%</div>
-                  <div className="text-sm text-slate-500">Accuracy Rate</div>
-                </div>
+            <div className="relative">
+              <div className="rounded-[1.5rem] overflow-hidden border border-[#E5E7EB] shadow-lg bg-white p-2.5 max-w-sm">
+                <img 
+                  src="/assets/images/modern_healthcare_hero.png" 
+                  alt="Clinical AI Analysis" 
+                  className="w-full h-auto object-cover rounded-[1.25rem] grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
+                />
               </div>
+              
+              {/* Floating Element - Repositioned to Top-Right for better alignment as per 'above image' request */}
+              <motion.div 
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute -top-6 -right-6 bg-[#111111] p-5 rounded-[1.25rem] text-white shadow-xl hidden xl:block border border-white/10 z-20"
+              >
+                <Activity className="text-[#E8A26A] mb-2" size={20} />
+                <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-0.5">Status</div>
+                <div className="text-base font-bold">Neural Active</div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-white mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why Choose ArrythmiaDetector?</h2>
-            <p className="text-slate-500 text-lg">Harnessing advanced technology for better healthcare outcomes.</p>
+      <section className="py-20 px-6 lg:px-10 bg-white">
+        <div className="max-w-[1140px] mx-auto">
+          <div className="grid lg:grid-cols-2 gap-10 mb-12 items-end">
+            <div>
+              <div className="text-[#E8A26A] font-bold text-[9px] uppercase tracking-widest mb-3">Capabilities</div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-[#111111] tracking-tight leading-none">Clinical Excellence.</h2>
+            </div>
+            <p className="text-base text-[#6B7280] max-w-sm leading-relaxed">
+              State-of-the-art AI combined with intuitive medical workflows.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-5 pb-20">
             <FeatureCard 
-              icon={<Zap className="w-8 h-8" />}
-              title="Instant Results"
-              description="Get your ECG classification in seconds with our optimized deep learning model."
+              icon={<Zap />}
+              title="Neural Analysis"
+              description="Keras models provide classification results in under 2 seconds."
             />
             <FeatureCard 
-              icon={<Shield className="w-8 h-8" />}
-              title="Secure & Private"
-              description="Your data is encrypted and handled with the highest healthcare security standards."
+              icon={<Shield />}
+              title="Enterprise Grade"
+              description="Bank-grade encryption and HIPAA-compliant data handling."
             />
             <FeatureCard 
-              icon={<Users className="w-8 h-8" />}
-              title="Role-Based Access"
-              description="Tailored dashboards for patients, doctors, and administrators."
+              icon={<Users />}
+              title="Collaborative"
+              description="Seamless data sharing between patients and physicians."
             />
           </div>
         </div>
@@ -94,12 +120,15 @@ const Home = () => {
 };
 
 const FeatureCard = ({ icon, title, description }) => (
-  <div className="p-8 rounded-3xl bg-healthcare-light border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-healthcare-blue mb-6 shadow-sm group-hover:bg-healthcare-blue group-hover:text-white transition-colors duration-300">
-      {icon}
+  <div className="bg-[#F9FAFB] p-6 rounded-[1.25rem] border border-[#E5E7EB] hover:border-[#111111] transition-all duration-300 group">
+    <div className="w-10 h-10 bg-white text-[#111111] flex items-center justify-center rounded-lg mb-6 border border-[#E5E7EB] group-hover:bg-[#111111] group-hover:text-white transition-all">
+      {React.cloneElement(icon, { size: 18 })}
     </div>
-    <h3 className="text-xl font-bold mb-3">{title}</h3>
-    <p className="text-slate-500 leading-relaxed">{description}</p>
+    <h3 className="text-lg font-bold mb-2 text-[#111111] tracking-tight">{title}</h3>
+    <p className="text-[#6B7280] text-xs leading-relaxed font-medium mb-6">{description}</p>
+    <div className="flex items-center gap-2 text-[8px] font-bold text-[#6B7280] uppercase tracking-widest group-hover:text-[#111111] transition-colors">
+      Details <ChevronRight size={12} />
+    </div>
   </div>
 );
 
