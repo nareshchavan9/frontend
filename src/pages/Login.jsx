@@ -104,11 +104,6 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2 ml-1">
-              <input type="checkbox" className="w-4 h-4 rounded border-[#E5E7EB] text-[#111111] focus:ring-[#111111]" />
-              <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Remember this session</span>
-            </div>
-
             <div className="pt-4">
               <button 
                 type="submit" 

@@ -16,13 +16,18 @@ import {
   Heart,
   ChevronRight,
   Shield,
-  Search
+  Search,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
+  const [lifestyleNotes, setLifestyleNotes] = useState([]);
+  const [showHabitModal, setShowHabitModal] = useState(false);
+  const [newHabit, setNewHabit] = useState({ title: '', category: 'Activity' });
   const [stats, setStats] = useState({
     totalPredictions: 0,
     lastResult: 'N/A',
@@ -48,7 +53,40 @@ const PatientDashboard = () => {
       }
     };
     fetchHistory();
-  }, []);
+
+    // Fetch user profile to get lifestyle notes
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/auth/me'); // Assuming there's a me endpoint or I can use user from context
+        // But context user might be stale. I'll use the user from context if available or fetch
+        if (user?.lifestyle_notes) {
+          setLifestyleNotes(user.lifestyle_notes);
+        }
+      } catch (err) {}
+    };
+    fetchProfile();
+  }, [user]);
+
+  const handleAddHabit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/auth/lifestyle-notes', newHabit);
+      setLifestyleNotes([...lifestyleNotes, { ...newHabit, timestamp: new Date().toISOString() }]);
+      setShowHabitModal(false);
+      setNewHabit({ title: '', category: 'Activity' });
+    } catch (err) {
+      alert('Failed to add note');
+    }
+  };
+
+  const handleDeleteHabit = async (timestamp) => {
+    try {
+      await api.delete(`/auth/lifestyle-notes/${timestamp}`);
+      setLifestyleNotes(lifestyleNotes.filter(n => n.timestamp !== timestamp));
+    } catch (err) {
+      alert('Failed to delete note');
+    }
+  };
 
   return (
     <div className="pt-32 pb-0 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F5F5F5]">
@@ -112,6 +150,49 @@ const PatientDashboard = () => {
             <div className="text-lg font-bold text-[#111111]">Daily Insights</div>
           </div>
         </motion.button>
+      </div>
+
+      {/* Habits & Activities Section */}
+      <div className="mb-20">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em] flex items-center gap-3">
+            <ArrowRight size={12} className="text-[#111111]" /> Lifestyle & Habits
+          </h3>
+          <button 
+            onClick={() => setShowHabitModal(true)}
+            className="text-[9px] font-bold text-[#111111] uppercase tracking-widest hover:underline underline-offset-4 flex items-center gap-2"
+          >
+            <Plus size={12} /> Log Activity
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {lifestyleNotes.length > 0 ? (
+            lifestyleNotes.slice(-4).reverse().map((note, idx) => (
+              <div key={idx} className="bg-white p-6 rounded-3xl border border-[#E5E7EB] relative overflow-hidden group hover:border-[#111111] transition-all">
+                <div className="text-[8px] font-bold uppercase tracking-widest mb-3 flex items-center justify-between">
+                  <span className={note.category === 'Risk/Habit' ? 'text-red-500' : 'text-[#6B7280]'}>
+                    {note.category}
+                  </span>
+                  <button 
+                    onClick={() => handleDeleteHabit(note.timestamp)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-500"
+                  >
+                    <Trash2 size={10} />
+                  </button>
+                </div>
+                <div className="text-sm font-bold text-[#111111] mb-2">{note.title}</div>
+                <div className="text-[9px] font-medium text-[#9CA3AF] uppercase tracking-tighter">
+                  {new Date(note.timestamp).toLocaleDateString()}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="lg:col-span-4 p-12 bg-white rounded-[2rem] border border-dashed border-[#E5E7EB] text-center">
+              <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">No habits logged yet. Start tracking your daily activities.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mb-20">
@@ -211,6 +292,78 @@ const PatientDashboard = () => {
               >
                 Close Insights
               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Habit Log Modal */}
+      <AnimatePresence>
+        {showHabitModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowHabitModal(false)}
+              className="absolute inset-0 bg-[#111111]/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-[2rem] p-10 max-w-md w-full relative z-10 shadow-2xl border border-[#E5E7EB]"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#F3F4F6] text-[#111111] rounded-xl flex items-center justify-center">
+                    <Activity size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#111111]">Log Activity</h3>
+                    <p className="text-[#6B7280] text-[9px] font-bold uppercase tracking-widest">Lifestyle Tracking</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowHabitModal(false)} className="p-2 hover:bg-[#F3F4F6] rounded-xl transition-all">
+                  <X size={20} className="text-[#6B7280]" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddHabit} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest mb-3">Activity Description</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. 30 min morning walk"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] p-4 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] transition-all rounded-2xl"
+                    value={newHabit.title}
+                    onChange={(e) => setNewHabit({ ...newHabit, title: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest mb-3">Category</label>
+                  <select 
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] p-4 outline-none text-[#111111] font-bold text-sm focus:border-[#111111] transition-all rounded-2xl appearance-none"
+                    value={newHabit.category}
+                    onChange={(e) => setNewHabit({ ...newHabit, category: e.target.value })}
+                  >
+                    <option value="Activity">Activity / Exercise</option>
+                    <option value="Nutrition">Nutrition / Diet</option>
+                    <option value="Wellness">Wellness / Sleep</option>
+                    <option value="Medication">Medication</option>
+                    <option value="Risk/Habit">Risk / Habit</option>
+                  </select>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="bg-[#111111] text-white w-full py-4 text-xs font-bold uppercase tracking-[0.2em] shadow-xl shadow-black/10 hover:bg-black transition-all rounded-xl mt-4"
+                >
+                  Save Entry
+                </button>
+              </form>
             </motion.div>
           </div>
         )}

@@ -75,21 +75,21 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pt-32 pb-20 px-6 lg:px-10">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[#F5F5F5] pt-28 pb-16 px-6 lg:px-10">
+      <div className="max-w-4xl mx-auto">
         
         {/* Editorial Breadcrumb */}
-        <div className="mb-12">
-          <Link to="/" className="text-[#6B7280] hover:text-[#111111] transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-            <ArrowLeft size={14} /> Back to dashboard
+        <div className="mb-8">
+          <Link to="/" className="text-[#6B7280] hover:text-[#111111] transition-colors flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+            <ArrowLeft size={12} /> Back to dashboard
           </Link>
         </div>
 
-        {/* Profile Header Card */}
-        <div className="premium-job-card !p-12 mb-10 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#F3F4F6] rounded-full -mr-32 -mt-32"></div>
+        {/* Profile Header Card - Compact */}
+        <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] mb-8 relative overflow-hidden shadow-sm">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-[#F9FAFB] rounded-full -mr-24 -mt-24 opacity-50"></div>
           
-          <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
+          <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
             <div className="relative group">
               <input 
                 type="file" 
@@ -99,7 +99,7 @@ const Profile = () => {
                 onChange={handleFileChange}
               />
               <div 
-                className="w-32 h-32 bg-[#111111] text-white flex items-center justify-center rounded-[2rem] text-4xl font-bold shadow-2xl overflow-hidden relative"
+                className="w-24 h-24 bg-[#111111] text-white flex items-center justify-center rounded-[1.5rem] text-3xl font-bold shadow-xl overflow-hidden relative"
               >
                 {user?.profile_image ? (
                   <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
@@ -109,99 +109,99 @@ const Profile = () => {
                 
                 {uploading && (
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-white" />
+                    <Loader2 className="w-6 h-6 animate-spin text-white" />
                   </div>
                 )}
               </div>
               <button 
                 onClick={handleImageClick}
                 disabled={uploading}
-                className="absolute -bottom-2 -right-2 w-10 h-10 bg-white text-[#111111] rounded-xl border border-[#E5E7EB] flex items-center justify-center shadow-lg hover:bg-[#F3F4F6] transition-all disabled:opacity-50"
+                className="absolute -bottom-1 -right-1 w-8 h-8 bg-white text-[#111111] rounded-lg border border-[#E5E7EB] flex items-center justify-center shadow-lg hover:bg-[#F3F4F6] transition-all disabled:opacity-50"
               >
-                <Camera size={18} />
+                <Camera size={14} />
               </button>
             </div>
 
             <div className="text-center md:text-left flex-grow">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-3">
-                <h1 className="text-4xl font-bold text-[#111111] tracking-tight">{user?.name}</h1>
-                <span className="px-3 py-1 bg-[#F3F4F6] text-[#6B7280] text-[10px] font-black uppercase tracking-widest rounded-lg border border-[#E5E7EB]">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
+                <h1 className="text-2xl font-bold text-[#111111] tracking-tight">{user?.name}</h1>
+                <span className="px-2 py-0.5 bg-[#F3F4F6] text-[#6B7280] text-[8px] font-black uppercase tracking-widest rounded-md border border-[#E5E7EB]">
                   {user?.role}
                 </span>
               </div>
-              <p className="text-[#6B7280] font-medium flex items-center justify-center md:justify-start gap-2">
-                <Mail size={16} /> {user?.email}
+              <p className="text-[#6B7280] text-xs font-medium flex items-center justify-center md:justify-start gap-2">
+                <Mail size={14} /> {user?.email}
               </p>
             </div>
 
             <button 
               onClick={logout}
-              className="px-6 py-3 border border-red-100 text-red-500 text-xs font-bold uppercase tracking-widest hover:bg-red-50 transition-all rounded-xl"
+              className="px-5 py-2.5 border border-red-100 text-red-500 text-[10px] font-bold uppercase tracking-widest hover:bg-red-50 transition-all rounded-xl"
             >
               Sign Out
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Identity & Settings */}
-          <div className="lg:col-span-2 space-y-10">
-            <div className="premium-job-card !p-12">
-              <div className="flex items-center justify-between mb-12">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] shadow-sm">
+              <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-xl font-bold text-[#111111]">Identity Details</h3>
-                  <p className="text-sm text-[#6B7280] mt-1 font-medium">Update your professional clinical profile.</p>
+                  <h3 className="text-lg font-bold text-[#111111]">Identity Details</h3>
+                  <p className="text-[10px] text-[#6B7280] mt-0.5 font-bold uppercase tracking-widest">Clinical Profile Sync</p>
                 </div>
                 {!isEditing ? (
                   <button 
                     onClick={() => setIsEditing(true)}
-                    className="text-sm font-bold text-[#111111] hover:underline underline-offset-8"
+                    className="text-[10px] font-bold text-[#111111] hover:underline underline-offset-4 uppercase tracking-widest"
                   >
-                    Edit Details
+                    Edit
                   </button>
                 ) : (
                   <button 
                     onClick={() => setIsEditing(false)}
-                    className="text-sm font-bold text-red-500 hover:underline underline-offset-8"
+                    className="text-[10px] font-bold text-red-500 hover:underline underline-offset-4 uppercase tracking-widest"
                   >
                     Cancel
                   </button>
                 )}
               </div>
 
-              <form onSubmit={handleSave} className="grid grid-cols-1 gap-8">
-                <div className="group">
-                  <label className="block text-[11px] font-bold text-[#6B7280] uppercase tracking-widest mb-3 ml-1">Full Identity Name</label>
+              <form onSubmit={handleSave} className="grid grid-cols-1 gap-6">
+                <div>
+                  <label className="block text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 ml-1">Full Identity Name</label>
                   <input 
                     type="text" 
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className={`input-standard w-full ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-[#111111] transition-all ${!isEditing ? 'opacity-60' : ''}`}
                     disabled={!isEditing}
                     required
                   />
                 </div>
 
-                <div className="group">
-                  <label className="block text-[11px] font-bold text-[#6B7280] uppercase tracking-widest mb-3 ml-1">Clinical Email Reference</label>
+                <div>
+                  <label className="block text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 ml-1">Clinical Email</label>
                   <input 
                     type="email" 
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className={`input-standard w-full ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-[#111111] transition-all ${!isEditing ? 'opacity-60' : ''}`}
                     disabled={!isEditing}
                     required
                   />
                 </div>
 
                 {isEditing && (
-                  <div className="pt-4 flex justify-end">
+                  <div className="pt-2 flex justify-end">
                     <button 
                       type="submit"
                       disabled={loading}
-                      className="btn-primary-dark flex items-center gap-3 disabled:opacity-50"
+                      className="bg-[#111111] text-white px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-3 disabled:opacity-50"
                     >
-                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={14} />}
                       Save Changes
                     </button>
                   </div>
@@ -209,58 +209,49 @@ const Profile = () => {
               </form>
             </div>
 
-            <div className="premium-job-card !p-12">
-              <h3 className="text-xl font-bold text-[#111111] mb-10">Diagnostic Activity</h3>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="p-8 bg-[#F9FAFB] rounded-[1.5rem] border border-[#E5E7EB]">
-                  <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Total Analyses</p>
-                  <p className="text-4xl font-bold text-[#111111]">24</p>
+            <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] shadow-sm">
+              <h3 className="text-lg font-bold text-[#111111] mb-8">Diagnostic Activity</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
+                  <p className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Total Analyses</p>
+                  <p className="text-3xl font-bold text-[#111111]">24</p>
                 </div>
-                <div className="p-8 bg-[#F9FAFB] rounded-[1.5rem] border border-[#E5E7EB]">
-                  <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Risk Flags</p>
-                  <p className="text-4xl font-bold text-[#111111]">12</p>
+                <div className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
+                  <p className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Risk Flags</p>
+                  <p className="text-3xl font-bold text-[#111111]">12</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Security & Support Sidebar */}
-          <div className="space-y-10">
-            <div className="premium-job-card !p-10">
-              <div className="flex items-center gap-3 mb-10">
-                <div className="w-10 h-10 bg-[#F3F4F6] text-[#111111] flex items-center justify-center rounded-xl">
-                  <Shield size={20} strokeWidth={2.5} />
+          {/* Sidebar */}
+          <div className="space-y-8">
+            <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] shadow-sm">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-8 h-8 bg-[#F3F4F6] text-[#111111] flex items-center justify-center rounded-lg">
+                  <Shield size={16} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-lg font-bold text-[#111111]">Security</h3>
+                <h3 className="text-base font-bold text-[#111111]">Security</h3>
               </div>
               
-              <div className="space-y-8">
                 <div>
-                  <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-3">Two-Factor Auth</p>
-                  <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
-                    <span className="text-xs font-bold text-[#111111]">Inactive</span>
-                    <button className="text-xs font-bold text-[#111111] hover:underline underline-offset-4">Enable</button>
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-3">Identity Encryption</p>
-                  <p className="text-sm font-bold text-[#111111]">AES-256 Protocol Verified</p>
+                  <p className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Data residency</p>
+                  <p className="text-[11px] font-bold text-[#111111]">AES-256 Cloud Vault</p>
                 </div>
 
-                <div className="pt-4">
-                  <button className="w-full py-4 border border-[#111111] text-[#111111] text-xs font-bold uppercase tracking-widest hover:bg-[#F3F4F6] transition-all rounded-2xl">
-                    Update Pass-Key
+                <div className="pt-2">
+                  <button className="w-full py-3.5 border border-[#111111] text-[#111111] text-[10px] font-bold uppercase tracking-widest hover:bg-[#F3F4F6] transition-all rounded-xl">
+                    Change Passkey
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#111111] p-10 rounded-[2rem] text-white relative overflow-hidden shadow-2xl">
-              <Activity className="absolute -bottom-6 -right-6 w-32 h-32 text-white/5 rotate-12" />
-              <h4 className="text-xl font-bold mb-3 relative z-10">Professional Support</h4>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8 relative z-10">Need help with your clinical account or data residency questions?</p>
-              <button className="text-[#E8A26A] font-bold text-xs uppercase tracking-widest hover:underline relative z-10">Contact Concierge</button>
+            <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl">
+              <Activity className="absolute -bottom-4 -right-4 w-24 h-24 text-white/5 rotate-12" />
+              <h4 className="text-lg font-bold mb-2 relative z-10">Clinical Concierge</h4>
+              <p className="text-slate-400 text-[11px] leading-relaxed mb-6 relative z-10">Account or data residency questions?</p>
+              <button className="text-[#E8A26A] font-bold text-[10px] uppercase tracking-widest hover:underline relative z-10">Get Help</button>
             </div>
           </div>
         </div>
