@@ -245,7 +245,6 @@ const Profile = () => {
                   </button>
                 </div>
               </div>
-            </div>
 
             <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl">
               <Activity className="absolute -bottom-4 -right-4 w-24 h-24 text-white/5 rotate-12" />
