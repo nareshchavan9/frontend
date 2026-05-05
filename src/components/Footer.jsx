@@ -36,13 +36,13 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Green Bar */}
-      <div className="bg-accent py-8">
+      {/* Bottom Red Bar */}
+      <div className="bg-[#FCA5A5] py-8">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-2">
+          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1A1A1A] mb-2">
             Advanced Neural Diagnostics, Crafted for Clinical Excellence
           </p>
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/60">
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/60">
             © {new Date().getFullYear()} HeartSync Neural Systems | All Rights Reserved
           </p>
         </div>
@@ -54,7 +54,7 @@ const Footer = () => {
 const SocialIcon = ({ icon, href }) => (
   <a 
     href={href} 
-    className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-[#1A1A1A] hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
+    className="w-8 h-8 rounded-full bg-[#FCA5A5] flex items-center justify-center text-[#1A1A1A] hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
   >
     {icon}
   </a>
