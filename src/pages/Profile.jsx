@@ -226,19 +226,19 @@ const Profile = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-8">
-            <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl flex flex-col justify-between h-full min-h-[200px]">
-              <Activity className="absolute -bottom-4 -right-4 w-32 h-32 text-white opacity-5 rotate-12 pointer-events-none" />
+          <div className="space-y-6">
+            <div className="bg-[#111111] p-6 rounded-[1.5rem] text-white relative overflow-hidden shadow-xl border border-white/5">
+              <Activity className="absolute -bottom-6 -right-6 w-24 h-24 text-white opacity-5 rotate-12 pointer-events-none" />
               <div className="relative z-10">
-                <h4 className="text-xl font-bold mb-3 text-white">Clinical Support</h4>
-                <p className="text-gray-300 text-xs leading-relaxed mb-6 font-medium">Have questions about your account, data residency, or need technical assistance?</p>
+                <h4 className="text-base font-bold mb-2 text-white">Clinical Support</h4>
+                <p className="text-gray-400 text-[10px] leading-relaxed mb-4 font-medium">Need assistance with your account or clinical data residency?</p>
+                <a 
+                  href="mailto:support@arrhythmiadetection.com?subject=Clinical%20Portal%20Support%20Request" 
+                  className="inline-flex items-center gap-2 text-[#E8A26A] font-bold text-[9px] uppercase tracking-widest hover:text-white transition-colors"
+                >
+                  Contact Helpdesk <ArrowLeft className="w-3 h-3 rotate-180" />
+                </a>
               </div>
-              <a 
-                href="mailto:support@arrhythmiadetection.com?subject=Clinical%20Portal%20Support%20Request" 
-                className="inline-block text-[#E8A26A] font-bold text-[11px] uppercase tracking-widest hover:text-white transition-colors relative z-10 w-fit"
-              >
-                Contact Support &rarr;
-              </a>
             </div>
           </div>
         </div>

@@ -13,7 +13,8 @@ import {
   Edit3,
   X,
   Check,
-  ChevronLeft
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -21,23 +22,48 @@ const GlobalHistoryPage = () => {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', age: '', gender: 'male' });
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
+  const fetchHistory = async (pageNumber = 1, isAppend = false) => {
+    if (pageNumber === 1) setLoading(true);
+    else setLoadingMore(true);
+    
     try {
-      const response = await api.get('/predict/all');
-      setAnalyses(response.data);
+      const response = await api.get(`/predict/all?page=${pageNumber}&limit=20`);
+      const newItems = response.data;
+      
+      if (newItems.length < 20) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+      
+      if (isAppend) {
+        setAnalyses(prev => [...prev, ...newItems]);
+      } else {
+        setAnalyses(newItems);
+      }
     } catch (err) {
       console.error('Failed to fetch history', err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  useEffect(() => {
+    fetchHistory(1, false);
+  }, []);
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchHistory(nextPage, true);
   };
 
   const handleDelete = async (id) => {
@@ -77,14 +103,15 @@ const GlobalHistoryPage = () => {
 
       await api.put(`/predict/${editingId}`, formData);
       setEditingId(null);
-      fetchHistory();
+      fetchHistory(1, false); // Reload first page
     } catch (err) {
       alert('Failed to update record');
     }
   };
 
   const filteredAnalyses = analyses.filter(a => 
-    (a.patient_name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    (a.patient_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (a.prediction?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
   const handleView = async (predictionId) => {
@@ -110,7 +137,7 @@ const GlobalHistoryPage = () => {
 
   return (
     <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5] relative">
-      {/* Top Right Search Bar - Absolute Positioning */}
+      {/* Search Bar */}
       <div className="absolute top-24 right-6 lg:right-10 w-full md:w-72 z-20">
         <div className="relative">
           <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
@@ -124,7 +151,6 @@ const GlobalHistoryPage = () => {
         </div>
       </div>
 
-      {/* Editorial Header - Centered */}
       <div className="flex flex-col items-center text-center mb-16 mt-16 md:mt-0 gap-4">
         <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
           <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
@@ -138,12 +164,18 @@ const GlobalHistoryPage = () => {
 
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
-          {filteredAnalyses.map((item) => (
+          {loading ? (
+             <div className="p-32 flex flex-col items-center justify-center gap-4 bg-white rounded-[2rem] border border-[#E5E7EB]">
+                <div className="w-10 h-10 border-2 border-[#111111] border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-[10px] font-bold text-[#111111] uppercase tracking-widest">Accessing Logs...</span>
+             </div>
+          ) : filteredAnalyses.map((item, index) => (
             <motion.div 
               key={item._id}
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: (index % 20) * 0.05 }}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white p-6 rounded-[1.5rem] border border-[#E5E7EB] hover:border-[#111111] transition-all shadow-sm group"
             >
@@ -179,7 +211,7 @@ const GlobalHistoryPage = () => {
               ) : (
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                   <div className="flex items-center gap-6 w-full md:w-auto">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.prediction === 'Normal' ? 'bg-[#F3F4F6] text-[#111111]' : 'bg-red-50 text-red-500'} group-hover:bg-[#111111] group-hover:text-white transition-all`}>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.prediction.includes('Normal') ? 'bg-[#F3F4F6] text-[#111111]' : 'bg-red-50 text-red-500'} group-hover:bg-[#111111] group-hover:text-white transition-all`}>
                       <Activity size={20} />
                     </div>
                     <div>
@@ -188,7 +220,7 @@ const GlobalHistoryPage = () => {
                         <span className="text-[9px] font-bold text-[#6B7280] flex items-center gap-1 uppercase tracking-widest">
                           <Clock size={12} /> {new Date(item.timestamp).toLocaleDateString()}
                         </span>
-                        <span className={`text-[8px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${item.prediction === 'Normal' ? 'border-[#E5E7EB] text-[#111111]' : 'border-red-100 text-red-500 bg-red-50'}`}>
+                        <span className={`text-[8px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${item.prediction.includes('Normal') ? 'border-[#E5E7EB] text-[#111111]' : 'border-red-100 text-red-500 bg-red-50'}`}>
                           {item.prediction}
                         </span>
                       </div>
@@ -216,6 +248,19 @@ const GlobalHistoryPage = () => {
           ))}
         </AnimatePresence>
       </div>
+
+      {hasMore && analyses.length > 0 && (
+        <div className="flex items-center justify-center gap-6 mt-12">
+          <button 
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="bg-[#111111] text-white px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-3 disabled:opacity-50 shadow-lg"
+          >
+            {loadingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronDown size={14} />}
+            {loadingMore ? "Updating Feed..." : "Load More Activity"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

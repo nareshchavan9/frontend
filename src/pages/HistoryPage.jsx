@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, FileText, Download, Activity, Calendar, Eye, ChevronDown, ChevronUp, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, FileText, Download, Activity, Calendar, Eye, ChevronDown, ChevronUp, ArrowRight, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -8,22 +8,47 @@ const HistoryPage = () => {
   const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [visibleCount, setVisibleCount] = useState(5);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchHistory = async (pageNumber = 1, isAppend = false) => {
+    if (pageNumber === 1) setLoading(true);
+    else setLoadingMore(true);
+    
+    try {
+      const response = await api.get(`/predict/history?page=${pageNumber}&limit=20`);
+      const newItems = response.data;
+      
+      if (newItems.length < 20) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+      
+      if (isAppend) {
+        setHistory(prev => [...prev, ...newItems]);
+      } else {
+        setHistory(newItems);
+      }
+    } catch (err) {
+      console.error('Failed to fetch history', err);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await api.get('/predict/history');
-        setHistory(response.data);
-      } catch (err) {
-        console.error('Failed to fetch history', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
+    fetchHistory(1, false);
   }, []);
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchHistory(nextPage, true);
+  };
 
   const handleDownload = async (predictionId) => {
     try {
@@ -56,12 +81,13 @@ const HistoryPage = () => {
   };
 
   const filteredHistory = history.filter(item => 
-    item.prediction.toLowerCase().includes(searchTerm.toLowerCase())
+    item.prediction.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.patient_name && item.patient_name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
     <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5]">
-      {/* Editorial Header - Centered */}
+      {/* Editorial Header */}
       <div className="flex flex-col items-center text-center mb-10 gap-3">
         <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
           <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
@@ -72,7 +98,7 @@ const HistoryPage = () => {
         <p className="text-[#6B7280] text-base font-medium max-w-lg">A comprehensive registry of your heart health evaluations and neural reports.</p>
       </div>
 
-      {/* Filters Area - Centered and Compact */}
+      {/* Filters Area */}
       <div className="max-w-2xl mx-auto mb-8 flex flex-col sm:flex-row gap-4 items-center">
         <div className="relative w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] w-4 h-4" />
@@ -84,9 +110,6 @@ const HistoryPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="p-3.5 bg-white border border-[#E5E7EB] rounded-xl hover:border-[#111111] transition-all text-[#111111]">
-          <Filter className="w-4 h-4" />
-        </button>
       </div>
 
       <div className="bg-white border border-[#E5E7EB] rounded-[2rem] overflow-hidden shadow-xl">
@@ -107,11 +130,11 @@ const HistoryPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F3F4F6]">
-                {filteredHistory.slice(0, visibleCount).map((item, index) => (
+                {filteredHistory.map((item, index) => (
                   <motion.tr 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: (index % 20) * 0.05 }}
                     key={item._id} 
                     className="hover:bg-[#F9FAFB]/50 transition-colors group"
                   >
@@ -120,7 +143,12 @@ const HistoryPage = () => {
                         <div className={`w-9 h-9 rounded-lg border border-[#E5E7EB] flex items-center justify-center ${item.prediction.toLowerCase().includes('normal') ? 'text-[#111111]' : 'text-red-500'}`}>
                           <Activity size={16} />
                         </div>
-                        <span className="text-sm font-bold text-[#111111] tracking-tight">{item.prediction}</span>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-[#111111] tracking-tight">{item.prediction}</span>
+                          {item.patient_name && (
+                            <span className="text-[9px] text-[#6B7280] font-bold uppercase tracking-widest">{item.patient_name}</span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-8 py-5">
@@ -171,23 +199,16 @@ const HistoryPage = () => {
         )}
       </div>
 
-      {filteredHistory.length > 5 && (
+      {hasMore && history.length > 0 && (
         <div className="flex items-center justify-center gap-6 mt-12">
-          {visibleCount < filteredHistory.length ? (
-            <button 
-              onClick={() => setVisibleCount(prev => prev + 5)}
-              className="bg-[#111111] text-white px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-3"
-            >
-              Load Additional <ChevronDown size={14} />
-            </button>
-          ) : (
-            <button 
-              onClick={() => setVisibleCount(5)}
-              className="border border-[#E5E7EB] text-[#111111] px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#F9FAFB] transition-all flex items-center gap-3"
-            >
-              Collapse Archive <ChevronUp size={14} />
-            </button>
-          )}
+          <button 
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="bg-[#111111] text-white px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-3 disabled:opacity-50"
+          >
+            {loadingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronDown size={14} />}
+            {loadingMore ? "Fetching Records..." : "Load Additional Records"}
+          </button>
         </div>
       )}
     </div>
