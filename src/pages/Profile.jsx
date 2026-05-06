@@ -10,7 +10,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(user?.two_factor_enabled || false);
+  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const fileInputRef = useRef(null);
   
   const [formData, setFormData] = useState({
@@ -36,18 +36,14 @@ const Profile = () => {
     setUploading(true);
     try {
       const data = new FormData();
-      data.append('name', formData.name);
-      data.append('email', formData.email);
-      data.append('image', file);
-
-      const response = await api.put('/auth/profile', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
+      data.append('file', file);
+      
+      const response = await api.post('/auth/profile-image', data);
       updateUser({ profile_image: response.data.profile_image });
+      setStatusMessage({ type: 'success', text: 'Profile image updated successfully.' });
     } catch (err) {
       console.error('Failed to upload image', err);
-      alert('Failed to upload profile image.');
+      setStatusMessage({ type: 'error', text: 'Failed to upload profile image.' });
     } finally {
       setUploading(false);
     }
@@ -67,23 +63,12 @@ const Profile = () => {
         email: response.data.email 
       });
       setIsEditing(false);
+      setStatusMessage({ type: 'success', text: 'Profile updated successfully.' });
     } catch (err) {
       console.error('Failed to update profile', err);
-      alert(err.response?.data?.detail || 'Failed to update profile.');
+      setStatusMessage({ type: 'error', text: err.response?.data?.detail || 'Failed to update profile.' });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleToggle2FA = async () => {
-    try {
-      const newState = !twoFactorEnabled;
-      const response = await api.post('/auth/toggle-2fa', { enabled: newState });
-      setTwoFactorEnabled(response.data.two_factor_enabled);
-      updateUser({ two_factor_enabled: response.data.two_factor_enabled });
-    } catch (err) {
-      console.error('Failed to toggle 2FA', err);
-      alert('Failed to update 2FA status.');
     }
   };
 
@@ -91,7 +76,15 @@ const Profile = () => {
     <div className="min-h-screen bg-[#F5F5F5] pt-28 pb-16 px-6 lg:px-10">
       <div className="max-w-4xl mx-auto">
         
-
+        {/* Status Message */}
+        {statusMessage.text && (
+          <div className={`mb-6 p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest ${statusMessage.type === 'error' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-600 border border-green-100'}`}>
+            <div className="flex justify-between items-center">
+              <span>{statusMessage.text}</span>
+              <button onClick={() => setStatusMessage({ type: '', text: '' })} className="opacity-50 hover:opacity-100">X</button>
+            </div>
+          </div>
+        )}
 
         {/* Profile Header Card - Compact */}
         <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] mb-8 relative overflow-hidden shadow-sm">
@@ -234,30 +227,7 @@ const Profile = () => {
 
           {/* Sidebar */}
           <div className="space-y-8">
-            <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] shadow-sm">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-8 bg-[#F3F4F6] text-[#111111] flex items-center justify-center rounded-lg">
-                  <Shield size={16} strokeWidth={2.5} />
-                </div>
-                <h3 className="text-base font-bold text-[#111111]">Security</h3>
-              </div>
-              <div className="pt-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] font-bold text-[#111111]">Two-Factor Auth</p>
-                    <p className="text-[9px] text-[#6B7280]">Add extra security</p>
-                  </div>
-                  <button 
-                    onClick={handleToggle2FA}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${twoFactorEnabled ? 'bg-[#111111]' : 'bg-[#E5E7EB]'}`}
-                  >
-                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${twoFactorEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-              </div>
-              </div>
-
-            <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl flex flex-col justify-between">
+            <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl flex flex-col justify-between h-full min-h-[200px]">
               <Activity className="absolute -bottom-4 -right-4 w-32 h-32 text-white opacity-5 rotate-12 pointer-events-none" />
               <div className="relative z-10">
                 <h4 className="text-xl font-bold mb-3 text-white">Clinical Support</h4>

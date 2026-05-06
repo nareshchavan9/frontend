@@ -23,25 +23,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
     
-    if (!response.data.requires_2fa && response.data.access_token) {
-      const { access_token, role, name, profile_image, email: userEmail, two_factor_enabled } = response.data;
-      const userData = { email: userEmail, role, name, profile_image, two_factor_enabled };
+    if (response.data.access_token) {
+      const { access_token, role, name, profile_image, email: userEmail } = response.data;
+      const userData = { email: userEmail, role, name, profile_image };
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
     }
     
-    return response.data;
-  };
-
-  const verifyOtp = async (email, otp) => {
-    const response = await api.post('/auth/verify-otp', { email, otp });
-    const { access_token, role, name, profile_image, email: userEmail, two_factor_enabled } = response.data;
-    
-    const userData = { email: userEmail, role, name, profile_image, two_factor_enabled };
-    localStorage.setItem('token', access_token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
     return response.data;
   };
 
@@ -63,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, verifyOtp, register, logout, loading, updateUser }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
