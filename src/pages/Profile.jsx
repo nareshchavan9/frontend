@@ -10,6 +10,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(user?.two_factor_enabled || false);
   const fileInputRef = useRef(null);
   
   const [formData, setFormData] = useState({
@@ -74,16 +75,23 @@ const Profile = () => {
     }
   };
 
+  const handleToggle2FA = async () => {
+    try {
+      const newState = !twoFactorEnabled;
+      const response = await api.post('/auth/toggle-2fa', { enabled: newState });
+      setTwoFactorEnabled(response.data.two_factor_enabled);
+      updateUser({ two_factor_enabled: response.data.two_factor_enabled });
+    } catch (err) {
+      console.error('Failed to toggle 2FA', err);
+      alert('Failed to update 2FA status.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] pt-28 pb-16 px-6 lg:px-10">
       <div className="max-w-4xl mx-auto">
         
-        {/* Editorial Breadcrumb */}
-        <div className="mb-8">
-          <Link to="/" className="text-[#6B7280] hover:text-[#111111] transition-colors flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
-            <ArrowLeft size={12} /> Back to dashboard
-          </Link>
-        </div>
+
 
         {/* Profile Header Card - Compact */}
         <div className="bg-white p-8 rounded-[2rem] border border-[#E5E7EB] mb-8 relative overflow-hidden shadow-sm">
@@ -233,24 +241,34 @@ const Profile = () => {
                 </div>
                 <h3 className="text-base font-bold text-[#111111]">Security</h3>
               </div>
-              
-                <div>
-                  <p className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Data residency</p>
-                  <p className="text-[11px] font-bold text-[#111111]">AES-256 Cloud Vault</p>
-                </div>
-
-                <div className="pt-2">
-                  <button className="w-full py-3.5 border border-[#111111] text-[#111111] text-[10px] font-bold uppercase tracking-widest hover:bg-[#F3F4F6] transition-all rounded-xl">
-                    Change Passkey
+              <div className="pt-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold text-[#111111]">Two-Factor Auth</p>
+                    <p className="text-[9px] text-[#6B7280]">Add extra security</p>
+                  </div>
+                  <button 
+                    onClick={handleToggle2FA}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${twoFactorEnabled ? 'bg-[#111111]' : 'bg-[#E5E7EB]'}`}
+                  >
+                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${twoFactorEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
                   </button>
                 </div>
               </div>
+              </div>
 
-            <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl">
-              <Activity className="absolute -bottom-4 -right-4 w-24 h-24 text-white/5 rotate-12" />
-              <h4 className="text-lg font-bold mb-2 relative z-10">Clinical Concierge</h4>
-              <p className="text-slate-400 text-[11px] leading-relaxed mb-6 relative z-10">Account or data residency questions?</p>
-              <button className="text-[#E8A26A] font-bold text-[10px] uppercase tracking-widest hover:underline relative z-10">Get Help</button>
+            <div className="bg-[#111111] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl flex flex-col justify-between">
+              <Activity className="absolute -bottom-4 -right-4 w-32 h-32 text-white opacity-5 rotate-12 pointer-events-none" />
+              <div className="relative z-10">
+                <h4 className="text-xl font-bold mb-3 text-white">Clinical Support</h4>
+                <p className="text-gray-300 text-xs leading-relaxed mb-6 font-medium">Have questions about your account, data residency, or need technical assistance?</p>
+              </div>
+              <a 
+                href="mailto:support@arrhythmiadetection.com?subject=Clinical%20Portal%20Support%20Request" 
+                className="inline-block text-[#E8A26A] font-bold text-[11px] uppercase tracking-widest hover:text-white transition-colors relative z-10 w-fit"
+              >
+                Contact Support &rarr;
+              </a>
             </div>
           </div>
         </div>
