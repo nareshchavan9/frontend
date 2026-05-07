@@ -27,7 +27,7 @@ const Login = () => {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Identity verification failed.');
+      setError(err.response?.data?.detail || 'Login failed.');
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ const Login = () => {
         <div className="w-10 h-10 bg-white border border-[#E5E7EB] flex items-center justify-center rounded-xl shadow-sm group-hover:border-[#111111] transition-all">
           <Activity className="w-5 h-5" />
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Portal Home</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Home</span>
       </Link>
 
       {/* Background Accents */}
@@ -58,7 +58,7 @@ const Login = () => {
         <div className="bg-white p-10 md:p-14 border border-[#E5E7EB] shadow-2xl rounded-[2.5rem]">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-[#111111] tracking-tight mb-2">Welcome Back</h2>
-            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">Continue with your clinical credentials</p>
+            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">Login to your account</p>
           </div>
 
           {error && (
@@ -73,7 +73,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="group">
-              <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest mb-3 ml-1">Clinical Email</label>
+              <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest mb-3 ml-1">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
                 <input 
@@ -89,7 +89,7 @@ const Login = () => {
 
             <div className="group">
               <div className="flex justify-between items-center mb-3 ml-1">
-                <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest">Pass-Key</label>
+                <label className="block text-[10px] font-bold text-[#111111] uppercase tracking-widest">Password</label>
                 <Link to="/forgot-password" size="sm" className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest hover:text-[#111111] transition-colors">Forgot?</Link>
               </div>
               <div className="relative">
@@ -111,13 +111,13 @@ const Login = () => {
                 disabled={loading}
                 className="bg-[#111111] text-white w-full py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-black transition-all flex items-center justify-center gap-3 shadow-2xl shadow-black/10 rounded-2xl active:scale-[0.98]"
               >
-                {loading ? "Authenticating..." : "Establish Secure Access"}
+                {loading ? "Logging in..." : "Login"}
               </button>
             </div>
           </form>
 
           <div className="mt-12 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B7280]">
-            No account? <Link to="/register" className="text-[#111111] font-bold hover:underline underline-offset-8 transition-all">Request access</Link>
+            No account? <Link to="/register" className="text-[#111111] font-bold hover:underline underline-offset-8 transition-all">Sign Up</Link>
           </div>
         </div>
       </motion.div>

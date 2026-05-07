@@ -41,7 +41,7 @@ const Register = () => {
         <div className="w-10 h-10 bg-white border border-[#E5E7EB] flex items-center justify-center rounded-xl shadow-sm group-hover:border-[#111111] transition-all">
           <Activity className="w-5 h-5" />
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Portal Home</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Home</span>
       </Link>
 
       {/* Background Accents */}
@@ -58,8 +58,8 @@ const Register = () => {
       >
         <div className="bg-white p-10 md:p-14 border border-[#E5E7EB] shadow-2xl rounded-[2rem]">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-[#111111] tracking-tight mb-2">Clinical Registry</h2>
-            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">Initialize your professional profile</p>
+            <h2 className="text-3xl font-bold text-[#111111] tracking-tight mb-2">Create Account</h2>
+            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">Fill in your details below</p>
           </div>
 
           {error && (
@@ -75,7 +75,7 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="group">
-                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Full Identity Name</label>
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
                   <input 
@@ -91,7 +91,7 @@ const Register = () => {
               </div>
 
               <div className="group">
-                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Clinical Email</label>
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
                   <input 
@@ -109,7 +109,7 @@ const Register = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="group">
-                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Secure Pass-Key</label>
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#111111] transition-colors" />
                   <input 
@@ -125,7 +125,7 @@ const Register = () => {
               </div>
 
               <div className="group">
-                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Access Role</label>
+                <label className="block text-[9px] font-bold text-[#111111] uppercase tracking-widest mb-2.5 ml-1">Who are you?</label>
                 <div className="relative">
                   <select 
                     name="role"
@@ -133,8 +133,8 @@ const Register = () => {
                     value={formData.role}
                     onChange={handleChange}
                   >
-                    <option value="patient">General Patient</option>
-                    <option value="doctor">Medical Specialist</option>
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
                 </div>
@@ -147,14 +147,14 @@ const Register = () => {
                 disabled={loading}
                 className="bg-[#111111] text-white w-full py-5 rounded-xl text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl shadow-black/10 active:scale-[0.98]"
               >
-                {loading ? "Processing..." : "Create Account"} <ArrowRight size={16} />
+                {loading ? "Signing up..." : "Sign Up"} <ArrowRight size={16} />
               </button>
             </div>
           </form>
 
           <div className="mt-10 text-center">
             <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.2em]">
-              Already registered? <Link to="/login" className="text-[#111111] hover:underline underline-offset-8 decoration-2 transition-all font-bold">Sign In Here</Link>
+              Already have an account? <Link to="/login" className="text-[#111111] hover:underline underline-offset-8 decoration-2 transition-all font-bold">Login</Link>
             </p>
           </div>
         </div>

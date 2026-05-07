@@ -42,7 +42,7 @@ const ForgotPassword = () => {
         <div className="w-10 h-10 bg-white border border-slate-100 flex items-center justify-center rounded-xl shadow-sm group-hover:border-tan transition-all">
           <Activity className="w-5 h-5" />
         </div>
-        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Portal Home</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
       </Link>
 
       {/* Background Accents */}
@@ -59,8 +59,8 @@ const ForgotPassword = () => {
       >
         <div className="bg-white p-10 sm:p-12 border border-slate-100 shadow-premium rounded-3xl">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-serif font-bold text-medical-dark tracking-tight mb-2">Access Recovery</h2>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Reset your clinical credentials</p>
+            <h2 className="text-3xl font-serif font-bold text-medical-dark tracking-tight mb-2">Reset Password</h2>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Enter your new password below</p>
           </div>
 
           {success ? (
@@ -68,8 +68,8 @@ const ForgotPassword = () => {
               <div className="w-16 h-16 bg-tan/10 text-tan flex items-center justify-center mx-auto mb-8 rounded-2xl">
                 <CheckCircle size={32} />
               </div>
-              <h3 className="text-2xl font-serif font-bold text-medical-dark mb-4">Credentials Updated</h3>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">Your access has been restored. Redirecting to the secure gateway...</p>
+              <h3 className="text-2xl font-serif font-bold text-medical-dark mb-4">Password Updated</h3>
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">Your password has been changed. Taking you to login...</p>
             </div>
           ) : (
             <>
@@ -85,7 +85,7 @@ const ForgotPassword = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">Verification Email</label>
+                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">Email Address</label>
                   <div className="relative group">
                     <input 
                       type="email" 
@@ -99,7 +99,7 @@ const ForgotPassword = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">New Pass-Key</label>
+                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">New Password</label>
                   <div className="relative group">
                     <input 
                       type="password" 
@@ -113,7 +113,7 @@ const ForgotPassword = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">Confirm New Pass-Key</label>
+                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">Confirm Password</label>
                   <div className="relative group">
                     <input 
                       type="password" 
@@ -132,7 +132,7 @@ const ForgotPassword = () => {
                     disabled={loading}
                     className="bg-medical-dark text-white w-full py-4 text-[10px] font-black uppercase tracking-[0.4em] hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-lg rounded-xl"
                   >
-                    {loading ? "Synchronizing..." : "Reset Credentials"}
+                    {loading ? "Updating..." : "Update Password"}
                   </button>
                 </div>
               </form>
