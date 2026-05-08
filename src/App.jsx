@@ -25,10 +25,11 @@ const AppRoutes = () => {
   const location = useLocation();
   const isAuthPage = ['/login', '/register', '/forgot-password'].includes(location.pathname);
   const isAIPath = location.pathname === '/ai-assistant';
+  const isDashboardPage = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/doctor');
 
   return (
     <>
-      {!isAIPath && !isAuthPage && <Navbar />}
+      {!isAIPath && !isAuthPage && !isDashboardPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />

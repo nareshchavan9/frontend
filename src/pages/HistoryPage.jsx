@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, FileText, Download, Activity, Calendar, Eye, ChevronDown, ChevronUp, ArrowRight, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Filter, FileText, Download, Activity, Calendar, Eye, ChevronDown, ChevronUp, ArrowRight, ChevronLeft, ChevronRight, Loader2, History } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 
 const HistoryPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialSearchTerm = searchParams.get('q') || '';
+  
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
@@ -18,7 +22,7 @@ const HistoryPage = () => {
     else setLoadingMore(true);
     
     try {
-      const response = await api.get(`/predict/history?page=${pageNumber}&limit=20`);
+      const response = await api.get(`/predict/history?page=${pageNumber}&limit=20&search=${encodeURIComponent(searchTerm)}`);
       const newItems = response.data;
       
       if (newItems.length < 20) {
@@ -41,8 +45,12 @@ const HistoryPage = () => {
   };
 
   useEffect(() => {
-    fetchHistory(1, false);
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchHistory(1, false);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
 
   const loadMore = () => {
     const nextPage = page + 1;
@@ -80,109 +88,113 @@ const HistoryPage = () => {
     }
   };
 
-  const filteredHistory = history.filter(item => 
-    item.prediction.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.patient_name && item.patient_name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+
 
   return (
-    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5]">
+    <div className="pt-28 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F8FAFC]">
       {/* Editorial Header */}
-      <div className="flex flex-col items-center text-center mb-10 gap-3">
-        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
-          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+      <div className="flex flex-col items-center text-center mb-12 gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 text-slate-400 font-bold text-[9px] uppercase tracking-[0.3em] mb-2"
+        >
+          <span className="w-8 h-[1px] bg-teal-100"></span>
           Clinical Diagnostic Registry
-          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
-        </div>
-        <h1 className="text-3xl lg:text-4xl font-bold text-[#111111] tracking-tight mb-2">Diagnostic History</h1>
-        <p className="text-[#6B7280] text-base font-medium max-w-lg">A comprehensive registry of your heart health evaluations and neural reports.</p>
+          <span className="w-8 h-[1px] bg-teal-100"></span>
+        </motion.div>
+        <h1 className="text-4xl font-bold text-[#1A1A1A] tracking-tight mb-2">Diagnostic History</h1>
+        <p className="text-slate-500 text-sm font-medium max-w-xl">Comprehensive archive of cardiac evaluations and neural diagnostic reports.</p>
       </div>
 
       {/* Filters Area */}
-      <div className="max-w-2xl mx-auto mb-8 flex flex-col sm:flex-row gap-4 items-center">
-        <div className="relative w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] w-4 h-4" />
+      <div className="max-w-xl mx-auto mb-10">
+        <div className="relative group">
+          <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#14B8A6] transition-colors" />
           <input 
             type="text" 
-            placeholder="Search evaluations..." 
-            className="w-full pl-12 pr-6 py-3.5 bg-white border border-[#E5E7EB] rounded-xl focus:border-[#111111] outline-none text-xs font-bold uppercase tracking-widest transition-all"
+            placeholder="Search evaluations or outcome types..." 
+            className="input-premium !bg-white border-slate-200/60 w-full pl-14 pr-6 py-4 text-[11px] font-bold uppercase tracking-widest shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="bg-white border border-[#E5E7EB] rounded-[2rem] overflow-hidden shadow-xl">
+      <div className="premium-card bg-white overflow-hidden border-slate-50 shadow-2xl">
         {loading ? (
-          <div className="p-32 flex flex-col items-center justify-center gap-4">
-            <div className="w-10 h-10 border-2 border-[#111111] border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-[10px] font-bold text-[#111111] uppercase tracking-widest">Synchronizing Archive...</span>
+          <div className="py-40 flex flex-col items-center justify-center gap-6">
+            <div className="relative">
+              <div className="w-12 h-12 border-4 border-teal-50 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-12 h-12 border-4 border-[#14B8A6] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] animate-pulse">Synchronizing Archive...</span>
           </div>
-        ) : filteredHistory.length > 0 ? (
+        ) : history.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Diagnostic Outcome</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Precision Index</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">Registered Date</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest text-right">Actions</th>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Diagnostic Outcome</th>
+                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Precision Index</th>
+                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Registry Date</th>
+                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F3F4F6]">
-                {filteredHistory.map((item, index) => (
+              <tbody className="divide-y divide-slate-50">
+                {history.map((item, index) => (
                   <motion.tr 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: (index % 20) * 0.05 }}
+                    transition={{ delay: (index % 20) * 0.03 }}
                     key={item._id} 
-                    className="hover:bg-[#F9FAFB]/50 transition-colors group"
+                    className="hover:bg-slate-50/30 transition-colors group cursor-default"
                   >
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-9 h-9 rounded-lg border border-[#E5E7EB] flex items-center justify-center ${item.prediction.toLowerCase().includes('normal') ? 'text-[#111111]' : 'text-red-500'}`}>
-                          <Activity size={16} />
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-5">
+                        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shadow-sm transition-colors ${item.prediction.toLowerCase().includes('normal') ? 'bg-teal-50 border-teal-100 text-[#14B8A6]' : 'bg-red-50 border-red-100 text-red-500'}`}>
+                          <Activity size={18} />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-sm font-bold text-[#111111] tracking-tight">{item.prediction}</span>
+                          <span className="text-[15px] font-bold text-[#1A1A1A] tracking-tight group-hover:text-[#14B8A6] transition-colors">{item.prediction}</span>
                           {item.patient_name && (
-                            <span className="text-[9px] text-[#6B7280] font-bold uppercase tracking-widest">{item.patient_name}</span>
+                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{item.patient_name}</span>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-32 h-1 bg-[#F3F4F6] rounded-full overflow-hidden shrink-0">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-5">
+                        <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
                           <div 
-                            className={`h-full ${item.confidence > 0.9 ? 'bg-[#111111]' : 'bg-[#E8A26A]'}`} 
+                            className={`h-full ${item.confidence > 0.9 ? 'bg-[#14B8A6]' : 'bg-red-400'}`} 
                             style={{ width: `${item.confidence * 100}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-[#111111] tracking-widest tabular-nums">{(item.confidence * 100).toFixed(1)}%</span>
+                        <span className="text-[11px] font-bold text-[#1A1A1A] tracking-[0.1em] tabular-nums">{(item.confidence * 100).toFixed(1)}%</span>
                       </div>
                     </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">
-                        <Calendar size={14} />
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <Calendar size={14} className="text-teal-500 opacity-60" />
                         {new Date(item.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </div>
                     </td>
-                    <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => handleView(item._id)}
-                          className="w-8 h-8 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#111111] hover:text-white transition-all flex items-center justify-center"
-                          title="View Report"
+                          className="w-9 h-9 rounded-xl border border-slate-100 text-slate-400 hover:bg-[#14B8A6] hover:text-white hover:border-[#14B8A6] transition-all flex items-center justify-center shadow-sm"
+                          title="View PDF"
                         >
-                          <Eye size={14} />
+                          <Eye size={16} />
                         </button>
                         <button 
                           onClick={() => handleDownload(item._id)}
-                          className="w-8 h-8 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#111111] hover:text-white transition-all flex items-center justify-center"
-                          title="Download PDF"
+                          className="w-9 h-9 rounded-xl border border-slate-100 text-slate-400 hover:bg-[#14B8A6] hover:text-white hover:border-[#14B8A6] transition-all flex items-center justify-center shadow-sm"
+                          title="Export Report"
                         >
-                          <Download size={14} />
+                          <Download size={16} />
                         </button>
                       </div>
                     </td>
@@ -192,9 +204,12 @@ const HistoryPage = () => {
             </table>
           </div>
         ) : (
-          <div className="p-32 text-center">
-            <div className="text-[#6B7280] mb-2 font-bold uppercase tracking-[0.2em] text-[10px]">Registry Empty</div>
-            <p className="text-[#6B7280] text-[10px] font-medium">No diagnostic records match your search.</p>
+          <div className="py-40 text-center">
+            <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6">
+               <History size={32} />
+            </div>
+            <div className="text-slate-400 mb-2 font-bold uppercase tracking-[0.3em] text-[10px]">No telemetry records found</div>
+            <p className="text-slate-300 text-[10px] font-bold uppercase tracking-widest">Initialize a new diagnostic analysis to populate registry.</p>
           </div>
         )}
       </div>
@@ -204,10 +219,12 @@ const HistoryPage = () => {
           <button 
             onClick={loadMore}
             disabled={loadingMore}
-            className="bg-[#111111] text-white px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-3 disabled:opacity-50"
+            className="btn-outline-premium group px-10 py-3.5 flex items-center gap-3"
           >
-            {loadingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronDown size={14} />}
-            {loadingMore ? "Fetching Records..." : "Load Additional Records"}
+            {loadingMore ? <Loader2 className="w-4 h-4 animate-spin text-[#14B8A6]" /> : <ChevronDown size={18} className="text-slate-300 group-hover:text-[#14B8A6] transition-colors" />}
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">
+              {loadingMore ? "Synchronizing Archive..." : "Load Additional Records"}
+            </span>
           </button>
         </div>
       )}

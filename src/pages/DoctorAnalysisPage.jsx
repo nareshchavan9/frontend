@@ -21,7 +21,8 @@ import {
   ChevronRight,
   Share2,
   Printer,
-  X
+  X,
+  Plus
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
@@ -31,7 +32,7 @@ const DoctorAnalysisPage = () => {
   const location = useLocation();
   const [step, setStep] = useState(1);
   const [patientInfo, setPatientInfo] = useState({
-    id: '', // Registered patient ID
+    id: '', 
     name: '',
     age: '',
     gender: 'male',
@@ -40,7 +41,6 @@ const DoctorAnalysisPage = () => {
 
   const [showImageModal, setShowImageModal] = useState(false);
 
-  // Handle pre-filled data from existing patient profile
   React.useEffect(() => {
     if (location.state?.prefill) {
       const { id, name, age, gender } = location.state.prefill;
@@ -68,7 +68,7 @@ const DoctorAnalysisPage = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       if (!selectedFile.type.startsWith('image/')) {
-        setError('Please upload an image file.');
+        setError('Please upload a valid image file.');
         return;
       }
       setFile(selectedFile);
@@ -99,7 +99,7 @@ const DoctorAnalysisPage = () => {
       setResult(response.data);
       setStep(3);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to analyze image. Please try again.');
+      setError(err.response?.data?.detail || 'Failed to analyze telemetry. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -124,25 +124,24 @@ const DoctorAnalysisPage = () => {
       window.open(url, '_blank');
     } catch (err) {
       console.error('Failed to view report', err);
-      alert('Failed to generate report preview.');
     }
   };
 
   return (
-    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F5F5F5]">
+    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F8FAFC]">
       {/* Unified Action Header */}
       <div className="flex items-center justify-between mb-12 gap-8">
         <div className="w-1/4">
           <button 
             onClick={() => navigate('/doctor')} 
-            className="flex items-center gap-3 text-[#111111] font-bold text-[10px] uppercase tracking-widest hover:translate-x-[-4px] transition-all bg-white px-5 py-2.5 rounded-xl border border-[#E5E7EB]"
+            className="btn-outline-premium group px-5 py-2.5 flex items-center gap-2"
           >
-            <ChevronLeft size={16} /> Dashboard
+            <ChevronLeft size={16} className="text-slate-400 group-hover:text-[#14B8A6] transition-colors" /> <span className="text-[10px]">Dashboard</span>
           </button>
         </div>
 
         <div className="flex-1 max-w-lg relative flex items-center justify-center">
-          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-[#E5E7EB] -z-0"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-100 -z-0"></div>
           <div className="flex items-center justify-between w-full relative z-10 px-4">
             <StepNode active={step >= 1} icon={<UserPlus size={16} />} label="PROFILE" />
             <StepNode active={step >= 2} icon={<Activity size={16} />} label="TELEMETRY" />
@@ -151,9 +150,9 @@ const DoctorAnalysisPage = () => {
         </div>
 
         <div className="w-1/4 flex flex-col items-end">
-          <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Diagnostic Mode</div>
-          <div className="text-[10px] font-black text-[#111111] uppercase tracking-[0.2em] flex items-center gap-2">
-            <Shield size={12} className="text-orange-500" /> Pipeline v4.2
+          <div className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-1">Diagnostic Mode</div>
+          <div className="text-[10px] font-black text-[#1A1A1A] uppercase tracking-[0.2em] flex items-center gap-2">
+            <Shield size={12} className="text-[#14B8A6]" /> Pipeline v4.2
           </div>
         </div>
       </div>
@@ -163,53 +162,53 @@ const DoctorAnalysisPage = () => {
           {step === 1 && (
             <motion.div 
               key="step1"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-white p-8 px-12 rounded-[2rem] border border-[#E5E7EB] shadow-sm"
+              className="premium-card bg-white p-6 md:p-8 border-slate-50"
             >
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center justify-between mb-10">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#111111] tracking-tight">Patient Identification</h2>
-                  <p className="text-[#6B7280] text-[9px] font-bold uppercase tracking-widest">Step 01 / Clinical Registry Entry</p>
+                  <h2 className="text-3xl font-bold text-[#1A1A1A] tracking-tight mb-1">Patient Identification</h2>
+                  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em]">Registry Entry Protocol</p>
                 </div>
                 <button 
                   onClick={() => setStep(2)}
                   disabled={!patientInfo.name || !patientInfo.age}
-                  className="bg-[#111111] text-white px-8 py-3 rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black transition-all flex items-center gap-3 disabled:opacity-20"
+                  className="btn-premium-teal group px-8 py-3.5 text-[10px] flex items-center gap-3 disabled:opacity-20"
                 >
-                  Proceed <ChevronRight size={16} />
+                  Proceed <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-6 items-end">
+              <div className="grid grid-cols-4 gap-8 items-end">
                 <div className="col-span-2">
-                  <label className="block text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 ml-1">Legal Name</label>
+                  <label className="block text-[10px] font-bold text-[#1A1A1A] uppercase tracking-widest mb-3 ml-1">Legal Name</label>
                   <input 
                     type="text" 
                     name="name"
-                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl py-3 px-5 outline-none text-[#111111] font-bold text-[13px] focus:border-[#111111] transition-all placeholder:opacity-30" 
+                    className="input-premium w-full text-[13px]" 
                     placeholder="Full Clinical Name"
                     value={patientInfo.name}
                     onChange={handleInfoChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 ml-1">Age</label>
+                  <label className="block text-[10px] font-bold text-[#1A1A1A] uppercase tracking-widest mb-3 ml-1">Age</label>
                   <input 
                     type="number" 
                     name="age"
-                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl py-3 px-5 outline-none text-[#111111] font-bold text-[13px] focus:border-[#111111] transition-all" 
+                    className="input-premium w-full text-[13px]" 
                     placeholder="YY"
                     value={patientInfo.age}
                     onChange={handleInfoChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 ml-1">Gender</label>
+                  <label className="block text-[10px] font-bold text-[#1A1A1A] uppercase tracking-widest mb-3 ml-1">Gender</label>
                   <select 
                     name="gender"
-                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl py-3 px-5 outline-none text-[#111111] font-bold focus:border-[#111111] transition-all appearance-none uppercase tracking-widest text-[10px]"
+                    className="input-premium w-full appearance-none pr-10 uppercase tracking-widest text-[11px]"
                     value={patientInfo.gender}
                     onChange={handleInfoChange}
                   >
@@ -225,67 +224,76 @@ const DoctorAnalysisPage = () => {
           {step === 2 && (
             <motion.div 
               key="step2"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-white p-8 px-12 rounded-[2rem] border border-[#E5E7EB] shadow-sm"
+              className="premium-card bg-white p-6 md:p-8 border-slate-50"
             >
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#F9FAFB]">
+              <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-50">
                 <div className="flex items-center gap-6">
-                  <button onClick={() => setStep(1)} className="p-2.5 bg-[#F9FAFB] rounded-xl hover:bg-[#111111] hover:text-white transition-all">
+                  <button onClick={() => setStep(1)} className="w-11 h-11 bg-slate-50 rounded-xl hover:bg-[#14B8A6] hover:text-white transition-all flex items-center justify-center text-[#1A1A1A]">
                     <ChevronLeft size={20} />
                   </button>
                   <div>
-                    <h2 className="text-2xl font-bold text-[#111111] tracking-tight">Signal Acquisition</h2>
-                    <p className="text-[#6B7280] text-[9px] font-bold uppercase tracking-widest">Step 02 / ECG Intake</p>
+                    <h2 className="text-3xl font-bold text-[#1A1A1A] tracking-tight mb-1">Signal Acquisition</h2>
+                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em]">ECG Telemetry Intake</p>
                   </div>
                 </div>
                 <button 
                   onClick={handleUpload}
                   disabled={!file || loading}
-                  className="bg-[#111111] text-white px-8 py-3 rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black transition-all flex items-center gap-3 disabled:opacity-20"
+                  className="btn-premium-teal group px-8 py-3.5 text-[10px] flex items-center gap-3 disabled:opacity-20"
                 >
-                  {loading ? <Loader2 className="animate-spin w-4 h-4" /> : 'Execute Analysis'} <ChevronRight size={16} />
+                  {loading ? <><Loader2 className="animate-spin w-5 h-5" /> Analyzing...</> : <><Plus size={18} /> Execute Analysis</>}
                 </button>
               </div>
 
-              <div className="grid grid-cols-5 gap-10 items-center">
+              <div className="grid grid-cols-5 gap-12 items-center">
                 <div className="col-span-2">
                   {!file ? (
-                    <label className="block border-2 border-dashed border-[#E5E7EB] rounded-[2rem] p-12 text-center hover:border-[#111111] hover:bg-[#F9FAFB] transition-all cursor-pointer group">
+                    <label className="block border-2 border-dashed border-teal-50 rounded-[2rem] p-12 text-center hover:border-[#14B8A6] hover:bg-teal-50/10 transition-all cursor-pointer group">
                       <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-                      <div className="w-14 h-14 bg-[#F3F4F6] text-[#111111] flex items-center justify-center mx-auto mb-4 rounded-2xl group-hover:bg-[#111111] group-hover:text-white transition-all">
-                        <Upload size={24} />
+                      <div className="w-16 h-16 bg-teal-50 text-[#14B8A6] flex items-center justify-center mx-auto mb-6 rounded-2xl group-hover:scale-110 transition-all shadow-sm">
+                        <Upload size={28} />
                       </div>
-                      <h3 className="text-sm font-bold text-[#111111] uppercase tracking-widest mb-1">Import ECG</h3>
-                      <p className="text-[#6B7280] text-[8px] font-bold uppercase tracking-widest">Imaging: High-Res</p>
+                      <h3 className="text-base font-bold text-[#1A1A1A] uppercase tracking-widest mb-2">Import ECG</h3>
+                      <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest opacity-60">High-Res Signal Required</p>
                     </label>
                   ) : (
-                    <div className="relative rounded-[2rem] overflow-hidden border border-[#E5E7EB] shadow-sm">
-                      <img src={preview} alt="ECG" className="w-full h-44 object-contain bg-[#F9FAFB]" />
-                      <button onClick={() => setFile(null)} className="absolute top-4 right-4 p-2 bg-white text-red-500 hover:bg-red-500 hover:text-white transition-all rounded-lg shadow-md">
-                        <AlertCircle size={16} />
+                    <div className="relative rounded-[2rem] overflow-hidden border border-slate-100 shadow-2xl group bg-slate-50">
+                      <img src={preview} alt="ECG" className="w-full h-48 object-contain" />
+                      <button onClick={() => setFile(null)} className="absolute top-4 right-4 w-10 h-10 bg-white text-red-500 hover:bg-red-500 hover:text-white transition-all rounded-xl shadow-xl flex items-center justify-center">
+                        <X size={20} />
                       </button>
                     </div>
                   )}
                 </div>
                 <div className="col-span-3">
-                  <div className="bg-[#F9FAFB] p-8 rounded-[2rem] border border-[#F3F4F6]">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-orange-500 border border-[#E5E7EB]">
-                        <Activity size={20} />
+                  <div className="bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full blur-3xl opacity-40 -z-0"></div>
+                    <div className="flex items-center gap-4 mb-6 relative z-10">
+                      <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-[#14B8A6] border border-slate-100 shadow-sm">
+                        <Activity size={24} />
                       </div>
                       <div>
-                        <h4 className="text-[11px] font-bold text-[#111111] uppercase tracking-widest">Neural Readiness</h4>
-                        <p className="text-[#6B7280] text-[8px] font-bold uppercase tracking-widest">Pipeline Version 4.2 Optimized</p>
+                        <h4 className="text-[12px] font-bold text-[#1A1A1A] uppercase tracking-[0.2em]">Neural Readiness</h4>
+                        <p className="text-[#14B8A6] text-[9px] font-bold uppercase tracking-widest">Protocol 4.2 Optimized</p>
                       </div>
                     </div>
-                    <p className="text-[#6B7280] text-[10px] leading-relaxed">System is calibrated for high-density ECG signal processing. Please ensure the clinical tracing is well-lit and covers the full diagnostic window for 98.5% precision mapping.</p>
+                    <p className="text-slate-500 text-xs leading-relaxed font-medium relative z-10">System calibrated for high-density ECG signal processing. Ensure clinical tracing is well-lit and covers full diagnostic window for 98.5% precision mapping.</p>
                   </div>
                 </div>
               </div>
 
-              {error && <div className="text-red-500 text-[10px] font-bold uppercase tracking-widest text-center mt-6">{error}</div>}
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="mt-10 p-5 bg-red-50 border-l-4 border-red-500 text-red-600 rounded-r-xl flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest"
+                >
+                  <AlertCircle size={20} /> {error}
+                </motion.div>
+              )}
             </motion.div>
           )}
 
@@ -294,78 +302,76 @@ const DoctorAnalysisPage = () => {
               key="step3"
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white p-6 px-12 rounded-[2.5rem] border border-[#E5E7EB] shadow-sm relative"
+              className="premium-card bg-white p-6 md:p-8 border-slate-50 shadow-3xl overflow-hidden"
             >
-              {/* Utility Bar: Top Left & Right Buttons */}
-              <div className="flex items-center justify-between mb-8">
+              {/* Utility Bar */}
+              <div className="flex items-center justify-between mb-10">
                 <button 
                   onClick={() => setStep(2)} 
-                  className="p-3 bg-[#F9FAFB] border border-[#E5E7EB] text-[#111111] rounded-xl hover:bg-[#111111] hover:text-white transition-all"
+                  className="w-12 h-12 bg-slate-50 border border-slate-100 text-[#1A1A1A] rounded-2xl hover:bg-[#14B8A6] hover:text-white hover:border-[#14B8A6] transition-all flex items-center justify-center shadow-sm"
                   title="Backward"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={20} />
                 </button>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <button 
                     onClick={() => handleViewReport(result.id)}
-                    className="p-3 bg-[#F9FAFB] border border-[#E5E7EB] text-[#111111] rounded-xl hover:bg-[#111111] hover:text-white transition-all"
-                    title="View Clinical Report"
+                    className="btn-outline-premium group px-6 py-3 flex items-center gap-3"
                   >
-                    <Eye size={18} />
+                    <Eye size={18} className="text-slate-400 group-hover:text-[#14B8A6] transition-colors" /> <span className="text-[10px] font-bold uppercase tracking-widest">Clinical Review</span>
                   </button>
                   <button 
                     onClick={() => handleDownload(result.id)}
-                    className="p-3 bg-[#111111] text-white rounded-xl hover:bg-black transition-all"
-                    title="Download Report"
+                    className="btn-premium-teal px-8 py-3.5 text-[10px] flex items-center gap-3 shadow-xl"
                   >
-                    <Download size={18} />
+                    <Download size={18} /> Export Data
                   </button>
                 </div>
               </div>
 
               {/* Central Diagnostic Content */}
-              <div className="flex items-center justify-center gap-16 mb-10 pb-8 border-b border-[#F9FAFB]">
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-green-50 text-green-600 flex items-center justify-center rounded-xl">
-                    <CheckCircle size={28} />
+              <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-12 pb-12 border-b border-slate-50 px-4">
+                <div className="flex items-center gap-8">
+                  <div className="w-16 h-16 bg-teal-50 text-[#14B8A6] flex items-center justify-center rounded-[1.5rem] shadow-inner">
+                    <CheckCircle size={32} />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#111111] tracking-tight">Diagnostics Finalized</h2>
-                    <p className="text-[#6B7280] text-[9px] font-bold uppercase tracking-widest">Clinical Data: {patientInfo.name}</p>
+                    <h2 className="text-3xl font-bold text-[#1A1A1A] tracking-tight mb-1">Diagnostics Finalized</h2>
+                    <p className="text-slate-400 text-[11px] font-bold uppercase tracking-[0.3em]">Patient: {patientInfo.name}</p>
                   </div>
                 </div>
 
-                <div className="flex justify-center gap-16">
+                <div className="flex gap-20">
                   <div className="text-center">
-                    <div className="text-[9px] text-[#6B7280] uppercase font-bold tracking-widest mb-1">Prediction</div>
-                    <div className={`text-4xl font-black tracking-tighter ${result.prediction === 'Normal' ? 'text-green-600' : 'text-red-600'}`}>{result.prediction}</div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.3em] mb-3">Classification</div>
+                    <div className={`text-5xl font-black tracking-tighter ${result.prediction === 'Normal' ? 'text-[#1A1A1A]' : 'text-red-500'}`}>{result.prediction}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-[9px] text-[#6B7280] uppercase font-bold tracking-widest mb-1">Confidence</div>
-                    <div className="text-4xl font-black text-[#111111] tracking-tighter">{(result.confidence * 100).toFixed(0)}%</div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.3em] mb-3">Accuracy</div>
+                    <div className="text-5xl font-black text-[#1A1A1A] tracking-tighter">{(result.confidence * 100).toFixed(0)}<span className="text-2xl font-bold text-[#14B8A6]">%</span></div>
                   </div>
                 </div>
               </div>
 
-              {/* Wide Grid Breakdown */}
-              <div className="bg-[#F9FAFB] rounded-[2rem] p-8 border border-[#F3F4F6]">
-                <div className="text-[9px] text-[#6B7280] uppercase font-bold tracking-[0.2em] mb-8 flex items-center gap-3">
-                  <Activity size={14} /> Neural Probability Distribution Index
+              {/* Probability Breakdown */}
+              <div className="bg-slate-50/50 rounded-[2.5rem] p-10 border border-slate-100">
+                <div className="text-[11px] text-[#1A1A1A] uppercase font-bold tracking-[0.4em] mb-10 flex items-center gap-4">
+                  <Activity size={16} className="text-[#14B8A6]" /> Neural Probability Distribution Index
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-10">
                   {result.breakdown.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-4">
-                      <div className="w-20 text-[8px] font-bold text-[#111111] uppercase tracking-tighter truncate">{item.label}</div>
-                      <div className="flex-1 bg-[#E5E7EB] rounded-full h-1.5 overflow-hidden">
+                    <div key={idx} className="flex flex-col gap-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-widest">{item.label}</div>
+                        <div className="text-[11px] font-black text-[#14B8A6] tabular-nums">{item.percentage.toFixed(0)}%</div>
+                      </div>
+                      <div className="flex-1 bg-white border border-slate-50 rounded-full h-2 overflow-hidden shadow-inner">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${Math.min(item.percentage, 100)}%` }}
-                          transition={{ duration: 1, delay: idx * 0.05 }}
-                          className={`h-full rounded-full ${item.label.toLowerCase().includes('normal') ? 'bg-[#111111]' : 'bg-red-500 shadow-sm shadow-red-500/20'}`}
+                          transition={{ duration: 1.2, delay: idx * 0.1, ease: "circOut" }}
+                          className={`h-full rounded-full ${item.label.toLowerCase().includes('normal') ? 'bg-[#14B8A6]' : 'bg-red-400'}`}
                         />
-                      </div>
-                      <div className="text-[10px] font-black w-10 text-right text-[#111111]">
-                        {item.percentage.toFixed(0)}%
                       </div>
                     </div>
                   ))}
@@ -375,51 +381,16 @@ const DoctorAnalysisPage = () => {
           )}
         </AnimatePresence>
       </div>
-
-      {/* Image View Modal Overlay (Retained for future use if needed) */}
-      <AnimatePresence>
-        {showImageModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-10 bg-black/90 backdrop-blur-md"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-5xl w-full bg-white rounded-[2rem] overflow-hidden shadow-2xl"
-            >
-              <div className="flex items-center justify-between p-6 border-b border-[#F3F4F6]">
-                <div>
-                  <h3 className="text-xl font-bold text-[#111111] tracking-tight">Original ECG Signal</h3>
-                  <p className="text-[#6B7280] text-[9px] font-bold uppercase tracking-widest">Source Image for Neural Analysis</p>
-                </div>
-                <button 
-                  onClick={() => setShowImageModal(false)}
-                  className="p-3 bg-[#F9FAFB] text-[#111111] rounded-xl hover:bg-red-500 hover:text-white transition-all"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="p-8 flex items-center justify-center bg-[#F9FAFB]">
-                <img src={preview} alt="ECG Signal" className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-lg border border-[#E5E7EB]" />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
 
 const StepNode = ({ active, icon, label }) => (
   <div className="flex flex-col items-center gap-3 relative z-10">
-    <div className={`w-11 h-11 rounded-[1.2rem] flex items-center justify-center transition-all duration-500 ${active ? 'bg-[#111111] text-white shadow-xl' : 'bg-white border border-[#E5E7EB] text-[#D1D5DB]'}`}>
-      {React.cloneElement(icon, { size: 16 })}
+    <div className={`w-12 h-12 rounded-[1.25rem] flex items-center justify-center transition-all duration-700 shadow-sm border ${active ? 'bg-[#1A1A1A] text-white border-transparent shadow-xl' : 'bg-white border-slate-100 text-slate-300'}`}>
+      {React.cloneElement(icon, { size: 18 })}
     </div>
-    <span className={`text-[9px] font-bold uppercase tracking-widest ${active ? 'text-[#111111]' : 'text-[#9CA3AF]'}`}>{label}</span>
+    <span className={`text-[10px] font-bold uppercase tracking-[0.3em] ${active ? 'text-[#1A1A1A]' : 'text-slate-300'}`}>{label}</span>
   </div>
 );
 

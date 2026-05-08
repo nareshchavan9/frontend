@@ -26,10 +26,10 @@ const AIHealthAssistant = () => {
   const abortControllerRef = useRef(null);
 
   const suggestions = [
-    { title: "ECG Analysis", desc: "Interpret my recent heart report", icon: <Activity className="text-[#111111]" /> },
-    { title: "Wellness Plan", desc: "Suggest a heart-healthy diet", icon: <HeartPulse className="text-[#111111]" /> },
-    { title: "Risk Factors", desc: "Signs of potential arrhythmia", icon: <Bot className="text-[#111111]" /> },
-    { title: "Clinical FAQ", desc: "Common diagnostic questions", icon: <FileText className="text-[#111111]" /> },
+    { title: "ECG Analysis", desc: "Interpret heart report informatics", icon: <Activity className="text-[#14B8A6]" /> },
+    { title: "Wellness Protocol", desc: "Suggest a heart-healthy diet", icon: <HeartPulse className="text-red-400" /> },
+    { title: "Arrhythmia Risks", desc: "Signs of potential cardiac strain", icon: <ShieldCheck className="text-sky-500" /> },
+    { title: "Diagnostic FAQ", desc: "Neural classification logic", icon: <FileText className="text-teal-600" /> },
   ];
 
   const fetchConversations = async () => {
@@ -87,7 +87,7 @@ const AIHealthAssistant = () => {
 
   const deleteConversation = async (e, convId) => {
     e.stopPropagation();
-    if (window.confirm("Delete this conversation?")) {
+    if (window.confirm("Delete this session from archive?")) {
       try {
         await api.delete(`/ai/conversations/${convId}`);
         fetchConversations();
@@ -149,7 +149,7 @@ const AIHealthAssistant = () => {
       console.error('AI chat failed:', error);
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
-        text: "Sorry, I encountered an error. Please try again later.",
+        text: "Clinical engine timed out. Please re-initialize transmission.",
         sender: 'bot'
       }]);
     } finally {
@@ -192,7 +192,7 @@ const AIHealthAssistant = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#F5F5F5] overflow-hidden text-[#111111]">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden text-[#1A1A1A]">
       <AnimatePresence>
         {!showSidebar && (
           <motion.button
@@ -200,77 +200,77 @@ const AIHealthAssistant = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             onClick={() => setShowSidebar(true)}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] w-10 h-10 bg-white border border-[#E5E7EB] rounded-xl flex items-center justify-center text-[#111111] shadow-2xl hover:bg-[#111111] hover:text-white transition-all"
+            className="fixed left-5 top-1/2 -translate-y-1/2 z-[60] w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-[#1A1A1A] shadow-xl hover:bg-[#14B8A6] hover:text-white transition-all group"
             title="Show Archive"
           >
-            <MessageSquare size={18} />
+            <MessageSquare size={18} className="group-hover:scale-110 transition-transform" />
           </motion.button>
         )}
         {showSidebar && (
           <motion.aside
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 300, opacity: 1 }}
+            animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            className="bg-[#111111] text-white flex flex-col shrink-0 h-full relative z-50 shadow-2xl"
+            className="bg-[#1A1A1A] text-white flex flex-col shrink-0 h-full relative z-50 shadow-2xl"
           >
-            <div className="p-8 flex flex-col h-full">
+            <div className="p-6 flex flex-col h-full">
               {/* Vertical Toggle Handle */}
               <button 
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-white border border-[#E5E7EB] rounded-full flex items-center justify-center text-[#111111] hover:bg-[#111111] hover:text-white transition-all shadow-xl z-[70] group"
+                className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-white border border-slate-100 rounded-full flex items-center justify-center text-[#1A1A1A] hover:bg-[#14B8A6] hover:text-white transition-all shadow-xl z-[70] group"
                 title="Hide Archive"
               >
-                <ChevronLeft size={14} className="group-hover:scale-125 transition-transform" />
+                <ChevronLeft size={12} className="group-hover:scale-125 transition-transform" />
               </button>
               
-              <div className="flex items-center justify-between mb-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-white text-[#111111] rounded-lg flex items-center justify-center">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 bg-[#14B8A6] text-[#1A1A1A] rounded-xl flex items-center justify-center shadow-lg">
                     <HeartPulse size={20} />
                   </div>
-                  <span className="font-bold text-lg tracking-tight">Clinical AI</span>
+                  <span className="font-bold text-lg tracking-tight">Clinical<span className="text-[#14B8A6]">AI</span></span>
                 </div>
               </div>
 
               <button 
                 onClick={handleNewChat}
-                className="flex items-center justify-center gap-3 w-full p-4 bg-white text-[#111111] hover:bg-[#F9FAFB] transition-all shadow-lg active:scale-95 text-[10px] font-bold uppercase tracking-[0.2em] mb-10 rounded-xl"
+                className="btn-premium-teal w-full p-3 text-[9px] uppercase tracking-[0.3em] mb-8 rounded-xl shadow-lg"
               >
                 <Plus size={16} /> New Consultation
               </button>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
-                <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] px-3 mb-6">Chat Archive</div>
+              <div className="flex-1 overflow-y-auto custom-scrollbar-dark space-y-1">
+                <div className="text-[9px] font-bold text-white/30 uppercase tracking-[0.4em] px-3 mb-4">Chat Archive</div>
                 {conversations.length === 0 ? (
-                  <div className="px-3 py-4 text-[10px] text-white/20 font-bold uppercase tracking-widest italic">No prior sessions</div>
+                  <div className="px-3 py-4 text-[9px] text-white/20 font-bold uppercase tracking-widest italic text-center border border-white/5 rounded-xl">Empty Registry</div>
                 ) : (
                   conversations.map((conv) => (
                     <button 
                       key={conv._id}
                       onClick={() => loadConversation(conv._id)}
-                      className={`flex items-center gap-3 w-full p-3 transition-colors text-left group relative rounded-xl ${currentConversationId === conv._id ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60 hover:bg-white/5'}`}
+                      className={`flex items-center gap-3 w-full p-3 transition-all text-left group relative rounded-xl mb-0.5 ${currentConversationId === conv._id ? 'bg-white/10 text-[#14B8A6] border border-white/5' : 'text-white/40 hover:text-white/80 hover:bg-white/5'}`}
                     >
-                      <MessageSquare size={14} className={currentConversationId === conv._id ? 'text-white' : 'text-white/20'} />
-                      <span className="truncate flex-1 text-[11px] font-bold uppercase tracking-widest">{conv.title}</span>
+                      <MessageSquare size={12} className={currentConversationId === conv._id ? 'text-[#14B8A6]' : 'text-white/10'} />
+                      <span className="truncate flex-1 text-[10px] font-bold uppercase tracking-widest">{conv.title}</span>
                       <button 
                         onClick={(e) => deleteConversation(e, conv._id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-all"
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={10} />
                       </button>
                     </button>
                   ))
                 )}
               </div>
 
-              <div className="mt-auto pt-6 border-t border-white/10">
-                <div className="p-3 bg-white/5 rounded-xl flex items-center gap-3">
-                  <div className="w-9 h-9 bg-white text-[#111111] rounded-lg flex items-center justify-center font-bold text-sm">
+              <div className="mt-auto pt-6 border-t border-white/5">
+                <div className="p-3 bg-white/5 rounded-xl flex items-center gap-3 group hover:bg-white/10 transition-colors border border-white/5">
+                  <div className="w-9 h-9 bg-[#14B8A6] text-[#1A1A1A] rounded-lg flex items-center justify-center font-bold text-xs">
                     {user?.name?.charAt(0) || 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[10px] text-white/40 font-bold uppercase tracking-widest truncate">{user?.name}</div>
-                    <div className="text-[8px] text-white/20 uppercase tracking-widest">{user?.role}</div>
+                    <div className="text-[10px] text-white/80 font-bold uppercase tracking-widest truncate">{user?.name}</div>
+                    <div className="text-[8px] text-white/30 uppercase tracking-[0.2em] font-medium">{user?.role}</div>
                   </div>
                 </div>
               </div>
@@ -279,91 +279,126 @@ const AIHealthAssistant = () => {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 flex flex-col h-full relative bg-[#F5F5F5]">
-        <header className="h-20 flex items-center justify-between px-10 bg-[#F5F5F5] border-b border-[#E5E7EB] sticky top-0 z-40">
-          <div className="flex items-center gap-4">
+      <main className="flex-1 flex flex-col h-full relative bg-[#F8FAFC]">
+        <header className="h-16 flex items-center justify-between px-8 bg-[#F8FAFC] border-b border-slate-50 sticky top-0 z-40">
+          <div className="flex items-center gap-5">
             <div className="flex items-center gap-3">
-              <span className="font-bold text-[#111111] tracking-tight">Clinical Assistant</span>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-50 text-[9px] font-bold text-green-600 border border-green-100">
-                <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse" /> Live
+              <span className="font-bold text-[#1A1A1A] tracking-tight text-base">Diagnostic Assistant</span>
+              <div className="flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-teal-50 text-[9px] font-bold text-[#14B8A6] border border-teal-100 shadow-sm">
+                <div className="w-1 h-1 bg-[#14B8A6] rounded-full animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.5)]" /> Neural Sync Active
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2 text-slate-300 mr-2">
+                <Activity size={14} />
+                <span className="text-[8px] font-bold uppercase tracking-widest">v4.2</span>
+             </div>
             <button 
               onClick={() => navigate(user?.role === 'doctor' ? '/doctor' : '/dashboard')} 
-              className="p-2.5 hover:bg-white text-[#111111] border border-transparent hover:border-[#E5E7EB] rounded-xl transition-all"
+              className="w-9 h-9 flex items-center justify-center hover:bg-slate-50 text-slate-400 hover:text-red-500 rounded-xl transition-all border border-transparent hover:border-slate-100 shadow-sm"
               title="Close Assistant"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-          <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
+        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col bg-[#F8FAFC]">
+          <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col px-6">
             {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-10 text-center pb-40">
-                <h1 className="text-4xl font-bold text-[#111111] mb-4 tracking-tight">How can I assist?</h1>
-                <p className="text-[#6B7280] text-base max-w-md mb-12 font-medium">Consult with our clinical agent for expert insights on cardiac wellness and diagnostic informatics.</p>
+              <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="w-16 h-16 bg-teal-50 text-[#14B8A6] rounded-2xl flex items-center justify-center mb-8 shadow-inner"
+                >
+                  <Bot size={32} />
+                </motion.div>
+                <h1 className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-3 tracking-tight">Clinical Consultation</h1>
+                <p className="text-slate-500 text-base max-w-lg mb-12 font-medium">Expert insights on cardiac telemetry and diagnostic protocols.</p>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
                   {suggestions.map((s, i) => (
-                    <button key={i} onClick={() => handleSend(null, s.desc)} className="p-6 bg-white border border-[#E5E7EB] hover:border-[#111111] rounded-2xl transition-all text-left flex gap-5 items-start group shadow-sm">
-                      <div className="w-10 h-10 bg-[#F9FAFB] text-[#111111] rounded-xl flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all shrink-0">
-                        {React.cloneElement(s.icon, { size: 20 })}
+                    <motion.button 
+                      key={i} 
+                      whileHover={{ y: -2 }}
+                      onClick={() => handleSend(null, s.desc)} 
+                      className="premium-card bg-white hover:border-[#14B8A6] text-left flex gap-4 items-start p-5 group rounded-2xl shadow-sm"
+                    >
+                      <div className="w-10 h-10 bg-slate-50 text-[#1A1A1A] rounded-xl flex items-center justify-center group-hover:bg-[#14B8A6] group-hover:text-white transition-all shrink-0 border border-slate-100 group-hover:border-transparent">
+                        {React.cloneElement(s.icon, { size: 18, className: 'group-hover:text-white transition-colors' })}
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-[#111111] mb-1">{s.title}</div>
-                        <div className="text-[10px] text-[#6B7280] font-medium leading-relaxed">{s.desc}</div>
+                        <div className="text-sm font-bold text-[#1A1A1A] mb-0.5 group-hover:text-[#14B8A6] transition-colors">{s.title}</div>
+                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed opacity-70">{s.desc}</div>
                       </div>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="p-10 space-y-8 pb-40">
+              <div className="py-8 space-y-8 pb-40">
                 {messages.map((msg) => (
-                  <div key={msg.id} className={`flex gap-5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    key={msg.id} 
+                    className={`flex gap-4 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
                     <div className={`flex gap-4 max-w-[85%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-[#E5E7EB] ${msg.sender === 'user' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm border ${msg.sender === 'user' ? 'bg-[#1A1A1A] border-white/10 text-white' : 'bg-white border-teal-50 text-[#14B8A6]'}`}>
                         {msg.sender === 'user' ? <User size={18} /> : <Bot size={18} />}
                       </div>
                       <div className="flex flex-col gap-2">
-                        <div className={`text-sm leading-relaxed group relative ${msg.sender === 'user' ? 'bg-white border border-[#E5E7EB] px-6 py-4 rounded-2xl rounded-tr-none text-[#111111] font-medium shadow-sm' : 'text-[#111111] bg-white border border-[#E5E7EB] px-6 py-4 rounded-2xl rounded-tl-none shadow-sm'}`}>
+                        <div className={`text-[14px] leading-relaxed group relative ${msg.sender === 'user' ? 'bg-[#1A1A1A] text-white px-6 py-4 rounded-[1.75rem] rounded-tr-none shadow-lg' : 'text-[#1A1A1A] bg-white border border-slate-100 px-6 py-4 rounded-[1.75rem] rounded-tl-none shadow-sm'}`}>
                           {editingId === msg.id ? (
                             <div className="flex flex-col gap-3 min-w-[240px]">
-                              <textarea className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 outline-none text-sm font-medium" value={editInput} onChange={(e) => setEditInput(e.target.value)} autoFocus rows={2} />
+                              <textarea className="w-full bg-white/10 border border-white/20 rounded-xl p-3 outline-none text-sm font-medium text-white" value={editInput} onChange={(e) => setEditInput(e.target.value)} autoFocus rows={2} />
                               <div className="flex justify-end gap-3">
-                                <button onClick={handleEditCancel} className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">Cancel</button>
-                                <button onClick={() => handleEditSubmit(msg.id)} className="text-[10px] font-bold uppercase tracking-widest bg-[#111111] text-white px-4 py-1.5 rounded-lg">Resend</button>
+                                <button onClick={handleEditCancel} className="text-[9px] font-bold uppercase tracking-widest text-white/50 hover:text-white transition-colors">Cancel</button>
+                                <button onClick={() => handleEditSubmit(msg.id)} className="text-[9px] font-bold uppercase tracking-widest bg-[#14B8A6] text-[#1A1A1A] px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Re-Sync</button>
                               </div>
                             </div>
                           ) : (
                             <>
                               {msg.sender === 'bot' ? (
-                                <div className="prose prose-slate prose-p:my-0 prose-headings:my-2 max-w-none text-sm leading-relaxed">
+                                <div className="prose prose-slate prose-p:my-0 prose-headings:my-2 max-w-none text-[14px] leading-relaxed text-[#1A1A1A]">
                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
                                 </div>
                               ) : (
                                 <>
                                   {msg.text}
-                                  <button onClick={() => handleEditStart(msg)} className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 text-[#6B7280] hover:text-[#111111] transition-all"><Edit2 size={14} /></button>
+                                  <button onClick={() => handleEditStart(msg)} className="absolute -left-10 top-4 opacity-0 group-hover:opacity-100 p-2 text-slate-300 hover:text-[#14B8A6] transition-all bg-white border border-slate-50 rounded-lg shadow-sm"><Edit2 size={12} /></button>
                                 </>
                               )}
                             </>
                           )}
                         </div>
+                        <div className={`text-[8px] font-bold uppercase tracking-widest text-slate-300 px-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                           {new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
                 {isTyping && (
-                  <div className="flex gap-4">
-                    <div className="w-9 h-9 bg-white border border-[#E5E7EB] rounded-xl text-[#111111] flex items-center justify-center shadow-sm"><Bot size={18} /></div>
-                    <div className="flex items-center gap-3 px-6 py-3 bg-white border border-[#E5E7EB] rounded-2xl rounded-tl-none shadow-sm"><Loader2 size={16} className="animate-spin text-[#111111]" /><span className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">Processing Inquiry...</span></div>
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex gap-4"
+                  >
+                    <div className="w-9 h-9 bg-teal-50 border border-teal-100 rounded-xl text-[#14B8A6] flex items-center justify-center shadow-sm"><Bot size={18} /></div>
+                    <div className="flex items-center gap-3 px-6 py-3 bg-white border border-slate-50 rounded-[1.75rem] rounded-tl-none shadow-sm border-dashed">
+                      <div className="flex gap-1">
+                        <div className="w-1 h-1 bg-[#14B8A6] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-1 h-1 bg-[#14B8A6] rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
+                        <div className="w-1 h-1 bg-[#14B8A6] rounded-full animate-bounce" style={{ animationDelay: '400ms' }} />
+                      </div>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#14B8A6]">Processing informatics...</span>
+                    </div>
+                  </motion.div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
@@ -371,33 +406,39 @@ const AIHealthAssistant = () => {
           </div>
         </div>
 
-        <div className="p-8 bg-[#F5F5F5] border-t border-[#E5E7EB]">
+        <div className="p-6 md:p-8 bg-[#F8FAFC] border-t border-slate-50">
           <div className="max-w-4xl mx-auto relative">
             {selectedFile && (
-              <div className="mb-4 p-4 bg-white border border-[#E5E7EB] rounded-2xl flex items-center gap-4 w-fit pr-12 relative shadow-lg">
-                <div className="w-10 h-10 bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center rounded-xl text-[#111111]"><Image size={20} /></div>
-                <div className="text-[10px]">
-                  <div className="font-bold text-[#111111] uppercase tracking-widest truncate max-w-[200px]">{selectedFile.name}</div>
-                  <div className="text-[#6B7280] font-bold uppercase tracking-widest mt-0.5">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</div>
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="mb-4 p-3 bg-white border border-teal-100 rounded-xl flex items-center gap-4 w-fit pr-12 relative shadow-xl"
+              >
+                <div className="w-10 h-10 bg-teal-50 border border-teal-100 flex items-center justify-center rounded-xl text-[#14B8A6] shadow-inner"><Image size={20} /></div>
+                <div>
+                  <div className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-widest truncate max-w-[200px]">{selectedFile.name}</div>
+                  <div className="text-[#14B8A6] font-bold uppercase tracking-[0.2em] text-[8px] mt-0.5">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB • READY</div>
                 </div>
-                <button onClick={removeFile} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-[#F3F4F6] text-[#6B7280] rounded-lg"><X size={14} /></button>
-              </div>
+                <button onClick={removeFile} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-lg transition-all"><X size={16} /></button>
+              </motion.div>
             )}
-            <form onSubmit={handleSend} className="relative flex items-center gap-4 bg-white border border-[#E5E7EB] p-2 pl-6 rounded-[1.5rem] focus-within:border-[#111111] focus-within:shadow-2xl transition-all">
+            <form onSubmit={handleSend} className="relative flex items-center gap-3 bg-white border border-slate-100 p-2 pl-6 rounded-[2rem] focus-within:border-[#14B8A6] focus-within:shadow-[0_20px_40px_-10px_rgba(20,184,166,0.1)] transition-all shadow-xl">
               <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*,.pdf" />
               
               <div className="relative">
-                <button type="button" onClick={() => setShowAddMenu(!showAddMenu)} className="p-3 text-[#6B7280] hover:text-[#111111] transition-all"><Plus size={24} className={showAddMenu ? 'rotate-45' : ''} /></button>
+                <button type="button" onClick={() => setShowAddMenu(!showAddMenu)} className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-[#14B8A6] hover:bg-teal-50 rounded-xl transition-all">
+                  <Plus size={22} className={showAddMenu ? 'rotate-45' : ''} />
+                </button>
                 <AnimatePresence>
                   {showAddMenu && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowAddMenu(false)} />
-                      <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: -10, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full left-0 mb-4 bg-white shadow-2xl border border-[#E5E7EB] p-2 min-w-[220px] z-50 rounded-[1.25rem] overflow-hidden">
-                        <button type="button" onClick={() => { fileInputRef.current.accept = "image/*"; fileInputRef.current.click(); setShowAddMenu(false); }} className="flex items-center gap-3 w-full p-4 hover:bg-[#F9FAFB] rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#111111] transition-colors">
-                          <div className="text-[#111111]"><Image size={18} /></div> Attach Medical Image
+                      <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: -12, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full left-0 mb-3 bg-white shadow-2xl border border-slate-100 p-2 min-w-[220px] z-50 rounded-2xl overflow-hidden">
+                        <button type="button" onClick={() => { fileInputRef.current.accept = "image/*"; fileInputRef.current.click(); setShowAddMenu(false); }} className="flex items-center gap-3 w-full p-4 hover:bg-teal-50 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] transition-all group">
+                          <div className="w-8 h-8 bg-slate-50 text-slate-400 group-hover:bg-[#14B8A6] group-hover:text-white rounded-lg flex items-center justify-center transition-all"><Image size={16} /></div> Medical Image
                         </button>
-                        <button type="button" onClick={() => { fileInputRef.current.accept = ".pdf,.doc,.docx"; fileInputRef.current.click(); setShowAddMenu(false); }} className="flex items-center gap-3 w-full p-4 hover:bg-[#F9FAFB] rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#111111] transition-colors">
-                          <div className="text-[#111111]"><FileText size={18} /></div> Attach Diagnostic File
+                        <button type="button" onClick={() => { fileInputRef.current.accept = ".pdf,.doc,.docx"; fileInputRef.current.click(); setShowAddMenu(false); }} className="flex items-center gap-3 w-full p-4 hover:bg-teal-50 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] transition-all group">
+                          <div className="w-8 h-8 bg-slate-50 text-slate-400 group-hover:bg-[#14B8A6] group-hover:text-white rounded-lg flex items-center justify-center transition-all"><FileText size={16} /></div> Diagnostic File
                         </button>
                       </motion.div>
                     </>
@@ -405,23 +446,26 @@ const AIHealthAssistant = () => {
                 </AnimatePresence>
               </div>
 
-              <textarea className="flex-1 max-h-[200px] min-h-[56px] py-4 bg-transparent outline-none resize-none text-sm text-[#111111] font-medium placeholder:text-[#E5E7EB] placeholder:uppercase placeholder:text-[10px] placeholder:tracking-[0.2em]" placeholder="INITIALIZE PROMPT..." rows={1} value={input} onChange={(e) => { setInput(e.target.value); e.target.style.height = 'inherit'; e.target.style.height = `${e.target.scrollHeight}px`; }} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); } }} />
+              <textarea className="flex-1 max-h-[160px] min-h-[48px] py-3 bg-transparent outline-none resize-none text-[14px] text-[#1A1A1A] font-medium placeholder:text-slate-200 placeholder:uppercase placeholder:text-[9px] placeholder:tracking-[0.4em] custom-scrollbar" placeholder="INITIALIZE CLINICAL PROMPT..." rows={1} value={input} onChange={(e) => { setInput(e.target.value); e.target.style.height = 'inherit'; e.target.style.height = `${e.target.scrollHeight}px`; }} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); } }} />
               <div className="flex items-center gap-2 pr-2">
                 {isTyping ? (
-                  <button type="button" onClick={handleStop} className="p-4 text-red-500 border-l border-[#E5E7EB]"><Square size={18} fill="currentColor" /></button>
+                  <button type="button" onClick={handleStop} className="w-10 h-10 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm"><Square size={16} fill="currentColor" /></button>
                 ) : (
-                  <button type="submit" disabled={!input.trim() && !selectedFile} className={`p-4 transition-all ${input.trim() || selectedFile ? 'text-[#111111]' : 'text-[#E5E7EB]'}`}><Send size={22} /></button>
+                  <button type="submit" disabled={!input.trim() && !selectedFile} className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all ${input.trim() || selectedFile ? 'bg-[#14B8A6] text-[#1A1A1A] shadow-lg shadow-[#14B8A6]/20 hover:scale-105' : 'bg-slate-50 text-slate-200'}`}>
+                    <Send size={20} />
+                  </button>
                 )}
               </div>
             </form>
-            <div className="flex items-center justify-center gap-6 mt-4 opacity-30">
+            <div className="flex items-center justify-center gap-8 mt-5 opacity-30 group hover:opacity-100 transition-opacity">
               <div className="flex items-center gap-2">
-                <ShieldCheck size={12} />
-                <span className="text-[8px] font-bold uppercase tracking-[0.2em]">Verified Secure</span>
+                <ShieldCheck size={12} className="text-[#14B8A6]" />
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#1A1A1A]">Clinical Security Active</span>
               </div>
+              <div className="w-0.5 h-0.5 bg-slate-300 rounded-full" />
               <div className="flex items-center gap-2">
-                <Activity size={12} />
-                <span className="text-[8px] font-bold uppercase tracking-[0.2em]">AI Sync Active</span>
+                <Activity size={12} className="text-[#14B8A6]" />
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#1A1A1A]">Neural Sync Connected</span>
               </div>
             </div>
           </div>

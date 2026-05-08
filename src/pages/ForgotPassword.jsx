@@ -29,121 +29,130 @@ const ForgotPassword = () => {
         navigate('/login');
       }, 3000);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to reset password. Please try again.');
+      setError(err.response?.data?.detail || 'Failed to reset password. Please check your data.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#F8FAFC] relative">
-      {/* Home Link - Top Left */}
-      <Link to="/" className="absolute top-8 left-8 z-20 flex items-center gap-3 text-medical-dark hover:text-tan transition-colors group">
-        <div className="w-10 h-10 bg-white border border-slate-100 flex items-center justify-center rounded-xl shadow-sm group-hover:border-tan transition-all">
-          <Activity className="w-5 h-5" />
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#F8FAFC] relative overflow-hidden">
+      {/* Home Link */}
+      <Link to="/" className="absolute top-8 left-8 z-20 flex items-center gap-3 text-[#1A1A1A] hover:text-[#14B8A6] transition-all group">
+        <div className="w-11 h-11 bg-white border border-slate-100 flex items-center justify-center rounded-xl shadow-sm group-hover:border-[#14B8A6] group-hover:scale-105 transition-all">
+          <Activity className="w-5 h-5 text-[#14B8A6]" />
         </div>
-        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Home</span>
       </Link>
 
-      {/* Background Accents */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-tan/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-medical-dark/5 rounded-full blur-[120px]" />
+      {/* Soft Background Gradient */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none -z-10">
+        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-teal-50/30 rounded-full blur-[140px] animate-pulse" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-sky-50/30 rounded-full blur-[140px] animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, scale: 0.98, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "circOut" }}
         className="max-w-[480px] w-full relative z-10"
       >
-        <div className="bg-white p-10 sm:p-12 border border-slate-100 shadow-premium rounded-3xl">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-serif font-bold text-medical-dark tracking-tight mb-2">Reset Password</h2>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Enter your new password below</p>
+        <div className="bg-white/80 backdrop-blur-xl p-10 sm:p-14 border border-white shadow-3xl rounded-[3rem]">
+          <div className="text-center mb-12">
+             <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-50 rounded-[1.5rem] mb-6 shadow-inner">
+                <Lock className="w-8 h-8 text-[#14B8A6]" />
+             </div>
+            <h2 className="text-4xl font-bold text-[#1A1A1A] tracking-tight mb-2">Reset Password</h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Enter your new password</p>
           </div>
 
           {success ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-tan/10 text-tan flex items-center justify-center mx-auto mb-8 rounded-2xl">
-                <CheckCircle size={32} />
-              </div>
-              <h3 className="text-2xl font-serif font-bold text-medical-dark mb-4">Password Updated</h3>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">Your password has been changed. Taking you to login...</p>
+            <div className="text-center py-10">
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="w-20 h-20 bg-teal-50 text-[#14B8A6] flex items-center justify-center mx-auto mb-10 rounded-[2rem] shadow-xl"
+              >
+                <CheckCircle size={40} />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-[#1A1A1A] mb-4">Password Updated</h3>
+              <p className="text-slate-400 text-[11px] font-bold uppercase tracking-[0.2em] leading-relaxed">Your password has been changed. Taking you to login...</p>
             </div>
           ) : (
             <>
               {error && (
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mb-8 p-4 bg-danger/5 border-l-4 border-danger text-danger text-[10px] font-bold uppercase tracking-wider rounded-r-lg"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="mb-10 p-5 bg-red-50 border-l-4 border-red-500 text-red-600 text-[10px] font-bold uppercase tracking-widest rounded-r-2xl"
                 >
-                  {error}
+                  <div className="flex items-center gap-3">
+                    <AlertCircle size={18} />
+                    {error}
+                  </div>
                 </motion.div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">Email Address</label>
-                  <div className="relative group">
-                    <input 
-                      type="email" 
-                      required
-                      className="w-full bg-white border border-slate-200 py-3 px-5 outline-none text-medical-dark font-bold text-sm focus:border-tan transition-all placeholder:text-slate-300 rounded-xl" 
-                      placeholder="name@clinical.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
+                  <label className="block text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.3em] mb-3 ml-2">Email Address</label>
+                  <input 
+                    type="email" 
+                    required
+                    className="input-premium w-full" 
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">New Password</label>
-                  <div className="relative group">
-                    <input 
-                      type="password" 
-                      required
-                      className="w-full bg-white border border-slate-200 py-3 px-5 outline-none text-medical-dark font-bold text-sm focus:border-tan transition-all rounded-xl" 
-                      placeholder="••••••••"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                  </div>
+                  <label className="block text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.3em] mb-3 ml-2">New Password</label>
+                  <input 
+                    type="password" 
+                    required
+                    className="input-premium w-full" 
+                    placeholder="••••••••"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-black text-medical-dark uppercase tracking-[0.3em] mb-2 ml-1">Confirm Password</label>
-                  <div className="relative group">
-                    <input 
-                      type="password" 
-                      required
-                      className="w-full bg-white border border-slate-200 py-3 px-5 outline-none text-medical-dark font-bold text-sm focus:border-tan transition-all rounded-xl" 
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </div>
+                  <label className="block text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.3em] mb-3 ml-2">Confirm Password</label>
+                  <input 
+                    type="password" 
+                    required
+                    className="input-premium w-full" 
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-6">
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="bg-medical-dark text-white w-full py-4 text-[10px] font-black uppercase tracking-[0.4em] hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-lg rounded-xl"
+                    className="btn-premium-teal w-full py-5 text-[11px] uppercase tracking-[0.4em] shadow-xl shadow-[#14B8A6]/20"
                   >
-                    {loading ? "Updating..." : "Update Password"}
+                    {loading ? "Saving..." : "Save Password"}
                   </button>
                 </div>
               </form>
             </>
           )}
 
-          <div className="mt-10 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-            Remembered? <Link to="/login" className="text-tan font-bold hover:underline underline-offset-8 transition-all">Back to Login</Link>
+          <div className="mt-12 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-300">
+            Remembered? <Link to="/login" className="text-[#14B8A6] font-black hover:underline underline-offset-8 transition-all">Login</Link>
           </div>
         </div>
       </motion.div>
+      
+      {/* Footer Branding */}
+      <div className="absolute bottom-12 left-0 w-full text-center opacity-10">
+         <div className="text-[9px] font-black uppercase tracking-[0.5em] text-[#1A1A1A]">HeartSync Neural Intelligence • v4.2.0</div>
+      </div>
     </div>
   );
 };

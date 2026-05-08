@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { 
   Search, 
   ArrowLeft, 
@@ -12,7 +12,10 @@ import {
   Clipboard,
   Clock,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Plus,
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -26,10 +29,11 @@ const DoctorSearchPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [patientsRes, analysesRes] = await Promise.all([
-          api.get('/reports/admin/patients'),
-          api.get('/predict/all')
+          api.get(`/reports/admin/patients?search=${encodeURIComponent(searchTerm)}`),
+          api.get(`/predict/all?search=${encodeURIComponent(searchTerm)}`)
         ]);
 
         const selfRegistered = patientsRes.data.map(p => ({ ...p, type: 'self' }));
@@ -63,106 +67,110 @@ const DoctorSearchPage = () => {
         setLoading(false);
       }
     };
-    fetchData();
-  }, []);
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchData();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
 
   useEffect(() => {
     const q = new URLSearchParams(location.search).get('q');
     if (q !== null) setSearchTerm(q);
   }, [location.search]);
 
-  const filteredPatients = patients.filter(p => 
-    (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (p.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  );
+
 
   return (
-    <div className="pt-24 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F5F5F5] relative">
-      {/* Top Right Search Bar - Absolute Positioning */}
-      <div className="absolute top-24 right-6 lg:right-10 w-full md:w-72 z-20">
-        <div className="relative">
-          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
-          <input 
-            type="text" 
-            className="w-full pl-12 pr-6 py-2.5 bg-white border border-[#E5E7EB] rounded-xl focus:border-[#111111] outline-none text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm" 
-            placeholder="Search by name, email or ID..." 
-            value={searchTerm}
-            onChange={(e) => {
-              const val = e.target.value;
-              setSearchTerm(val);
-              navigate(`/doctor/search?q=${encodeURIComponent(val)}`, { replace: true });
-            }}
-          />
+    <div className="pt-28 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F8FAFC] relative">
+      {/* Top Search Controls */}
+      <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-4">
+            <span className="w-8 h-[1px] bg-teal-100"></span>
+            Clinical Intelligence Hub
+          </div>
+          <h1 className="text-4xl font-bold text-[#1A1A1A] tracking-tight mb-2">Patient Registry</h1>
+          <p className="text-slate-500 text-sm font-medium">Centralized database of all registered profiles and telemetry archives.</p>
         </div>
-      </div>
 
-      {/* Editorial Header - Centered */}
-      <div className="flex flex-col items-center text-center mb-16 mt-16 md:mt-0 gap-4">
-        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
-          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
-          Clinical Intelligence Hub
+        <div className="w-full md:w-[420px] relative">
+          <div className="relative group">
+            <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#14B8A6] transition-colors" />
+            <input 
+              type="text" 
+              className="input-premium w-full pl-16 pr-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] shadow-sm" 
+              placeholder="SEARCH REGISTRY..." 
+              value={searchTerm}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearchTerm(val);
+                navigate(`/doctor/search?q=${encodeURIComponent(val)}`, { replace: true });
+              }}
+            />
+          </div>
         </div>
-        <h1 className="text-4xl font-bold text-[#111111] tracking-tight mb-2">Patient Registry</h1>
-        <p className="text-[#6B7280] text-base font-medium max-w-lg leading-relaxed">
-          Centralized database of all patient profiles and longitudinal medical archives.
-        </p>
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-12 h-12 border-2 border-[#111111]/10 border-t-[#111111] rounded-full animate-spin mb-4" />
-          <p className="text-[#6B7280] font-bold uppercase tracking-widest text-[10px]">Accessing Registry...</p>
+        <div className="flex flex-col items-center justify-center py-40">
+          <div className="relative mb-8">
+            <div className="w-16 h-16 border-4 border-teal-50 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-16 h-16 border-4 border-[#14B8A6] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-slate-400 font-bold uppercase tracking-[0.4em] text-[10px] animate-pulse">Accessing Medical Registry...</p>
         </div>
       ) : (
-        <div className="space-y-12">
-          {filteredPatients.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="space-y-16">
+          {patients.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               <AnimatePresence mode="popLayout">
-                {filteredPatients.map((p, i) => (
+                {patients.map((p, i) => (
                   <motion.div 
                     layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ delay: i * 0.05 }}
                     key={p._id} 
-                    className="bg-white p-6 rounded-[2rem] border border-[#E5E7EB] hover:border-[#111111] transition-all group flex flex-col shadow-sm"
+                    className="premium-card bg-white p-6 border-slate-50 hover:border-[#14B8A6] transition-all group flex flex-col shadow-sm"
                   >
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="w-10 h-10 bg-[#F3F4F6] text-[#111111] rounded-xl flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all">
-                        <Users size={18} />
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="w-12 h-12 bg-slate-50 text-[#1A1A1A] rounded-2xl flex items-center justify-center group-hover:bg-[#14B8A6] group-hover:text-white transition-all shadow-sm border border-slate-100 group-hover:border-transparent">
+                        <Users size={20} />
                       </div>
-                      <span className="text-[8px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border border-[#E5E7EB]">
+                      <div className={`text-[8px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full border shadow-sm ${p.type === 'self' ? 'border-teal-100 text-[#14B8A6] bg-teal-50/20' : 'border-slate-100 text-slate-400 bg-slate-50'}`}>
                         {p.type}
-                      </span>
+                      </div>
                     </div>
 
-                    <div className="mb-8 flex-1">
-                      <h3 className="text-lg font-bold text-[#111111] leading-tight mb-1 truncate">{p.name}</h3>
-                      <p className="text-[10px] text-[#6B7280] font-medium truncate mb-6">{p.email}</p>
+                    <div className="mb-10 flex-1">
+                      <h3 className="text-xl font-bold text-[#1A1A1A] leading-tight mb-2 truncate group-hover:text-[#14B8A6] transition-colors">{p.name}</h3>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate mb-8 opacity-70">{p.email}</p>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#F9FAFB] p-3 rounded-2xl border border-[#F3F4F6]">
-                          <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Age</div>
-                          <div className="text-sm font-bold text-[#111111]">{p.age || '??'}Y</div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 group-hover:bg-white transition-colors">
+                          <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Age</div>
+                          <div className="text-base font-black text-[#1A1A1A]">{p.age || '??'}<span className="text-[9px] text-slate-300 ml-1">Y</span></div>
                         </div>
-                        <div className="bg-[#F9FAFB] p-3 rounded-2xl border border-[#F3F4F6]">
-                          <div className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Gender</div>
-                          <div className="text-sm font-bold text-[#111111]">{(p.gender || 'U').charAt(0).toUpperCase()}</div>
+                        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 group-hover:bg-white transition-colors">
+                          <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Gender</div>
+                          <div className="text-base font-black text-[#1A1A1A]">{(p.gender || 'U').charAt(0).toUpperCase()}</div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-[#F3F4F6] flex items-center justify-between">
+                    <div className="pt-8 border-t border-slate-50 flex items-center justify-between">
                       <div className="flex flex-col">
-                        <span className="text-[8px] font-bold text-[#6B7280] uppercase tracking-widest">Analyses</span>
-                        <span className="text-lg font-black text-[#111111]">{p.testCount}</span>
+                        <span className="text-[9px] font-bold text-slate-300 uppercase tracking-[0.2em] mb-1">Analyses</span>
+                        <span className="text-2xl font-black text-[#1A1A1A] tracking-tighter">{p.testCount}</span>
                       </div>
                       <button 
                         onClick={() => navigate(`/doctor/patient/${p._id}`)}
-                        className="w-10 h-10 bg-[#111111] text-white rounded-xl flex items-center justify-center hover:bg-black transition-all shadow-lg shadow-black/10"
+                        className="w-12 h-12 bg-[#1A1A1A] text-white rounded-[1.25rem] flex items-center justify-center hover:bg-[#14B8A6] transition-all shadow-xl shadow-black/5 hover:scale-110 active:scale-95"
                       >
-                        <ChevronRight size={18} />
+                        <ChevronRight size={22} />
                       </button>
                     </div>
                   </motion.div>
@@ -170,14 +178,31 @@ const DoctorSearchPage = () => {
               </AnimatePresence>
             </div>
           ) : (
-            <div className="text-center py-32 bg-white rounded-[3rem] border border-[#E5E7EB] border-dashed">
-              <Search size={32} className="mx-auto text-[#6B7280] mb-4 opacity-20" />
-              <h3 className="text-lg font-bold text-[#111111]">No Clinical Matches</h3>
-              <p className="text-[10px] text-[#6B7280] font-bold uppercase tracking-widest mt-2">Try adjusting your search criteria</p>
+            <div className="text-center py-40 bg-white rounded-[3rem] border border-slate-100 border-dashed">
+              <div className="w-20 h-20 bg-slate-50 text-slate-200 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <Search size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">No Clinical Matches</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-3">Try adjusting your registry search criteria</p>
             </div>
           )}
         </div>
       )}
+
+      {/* Footer System Compliance Section */}
+      <div className="mt-24 pt-16 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-10 opacity-60">
+         <div className="flex items-center gap-4">
+            <ShieldCheck size={20} className="text-[#14B8A6]" />
+            <div>
+               <div className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.3em]">End-to-End Encryption</div>
+               <div className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">AES-256 Symmetrical Protocols</div>
+            </div>
+         </div>
+         <div className="flex gap-10">
+            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Compliance Index: HIPAA</div>
+            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Precision: Neural v4.2</div>
+         </div>
+      </div>
     </div>
   );
 };

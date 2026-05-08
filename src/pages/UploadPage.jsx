@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileImage, CheckCircle, AlertCircle, Loader2, Eye, Download, Activity, Zap, ShieldCheck, ArrowRight, Clipboard, ChevronRight } from 'lucide-react';
+import { Upload, X, FileImage, CheckCircle, AlertCircle, Loader2, Eye, Download, Activity, Zap, ShieldCheck, ArrowRight, Clipboard, ChevronRight, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -83,78 +83,82 @@ const UploadPage = () => {
   };
 
   return (
-    <div className="pt-32 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F5F5F5]">
-      {/* Editorial Header - Centered */}
-      <div className="flex flex-col items-center text-center mb-16 gap-4">
-        <div className="flex items-center gap-2 text-[#6B7280] font-bold text-[10px] uppercase tracking-widest mb-2">
-          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
+    <div className="pt-28 pb-20 px-6 lg:px-10 max-w-[1280px] mx-auto min-h-screen bg-[#F8FAFC]">
+      {/* Editorial Header */}
+      <div className="flex flex-col items-center text-center mb-12 gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 text-slate-400 font-bold text-[9px] uppercase tracking-[0.3em] mb-2"
+        >
+          <span className="w-8 h-[1px] bg-teal-100"></span>
           Neural Classification Engine
-          <span className="w-6 h-[1px] bg-[#E5E7EB]"></span>
-        </div>
-        <h1 className="text-3xl lg:text-4xl font-bold text-[#111111] tracking-tight mb-2">New Analysis</h1>
-        <p className="text-[#6B7280] text-base font-medium max-w-lg">Upload ECG traces for instantaneous AI-powered assessment.</p>
+          <span className="w-8 h-[1px] bg-teal-100"></span>
+        </motion.div>
+        <h1 className="text-4xl font-bold text-[#1A1A1A] tracking-tight mb-2">Initialize Analysis</h1>
+        <p className="text-slate-500 text-sm font-medium max-w-lg">Upload clinical ECG traces for instantaneous AI-powered assessment.</p>
         
         {result && (
-          <button onClick={reset} className="mt-4 btn-outline-dark flex items-center gap-2 text-xs">
-            <Activity size={14} /> New Investigation
+          <button onClick={reset} className="mt-4 btn-outline-premium group px-6 py-2.5 text-[10px] flex items-center gap-2">
+            <Plus size={14} className="text-[#14B8A6]" /> New Investigation
           </button>
         )}
       </div>
 
-      <div className="max-w-4xl mx-auto space-y-10">
+      <div className="max-w-4xl mx-auto space-y-8">
         {!result ? (
           <motion.div 
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-8 border border-[#E5E7EB] rounded-[2rem] shadow-xl"
+            className="premium-card bg-white p-6 md:p-10 border-teal-50/50"
           >
             {!file ? (
-              <label className="relative block border-2 border-dashed border-[#E5E7EB] rounded-[1.5rem] p-12 text-center hover:border-[#111111] hover:bg-[#F9FAFB] transition-all cursor-pointer group">
+              <label className="relative block border-2 border-dashed border-teal-100 rounded-[2.5rem] p-16 text-center hover:border-[#14B8A6] hover:bg-teal-50/10 transition-all cursor-pointer group">
                 <input 
                   type="file" 
                   className="hidden" 
                   accept="image/*"
                   onChange={handleFileChange}
                 />
-                <div className="w-16 h-16 bg-[#F3F4F6] text-[#111111] flex items-center justify-center mx-auto mb-6 rounded-2xl group-hover:bg-[#111111] group-hover:text-white transition-all">
-                  <Upload size={24} />
+                <div className="w-16 h-16 bg-teal-50 text-[#14B8A6] flex items-center justify-center mx-auto mb-8 rounded-2xl group-hover:scale-110 transition-all shadow-sm">
+                  <Upload size={28} />
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-[#111111]">Drop clinical image here</h3>
-                <p className="text-[#6B7280] text-[10px] font-bold uppercase tracking-widest">JPEG, PNG or DICOM exports</p>
+                <h3 className="text-2xl font-bold mb-3 text-[#1A1A1A] tracking-tight">Drop clinical image here</h3>
+                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Supported: JPEG, PNG, DICOM exports</p>
               </label>
             ) : (
-              <div className="space-y-6">
-                <div className="relative rounded-[1.5rem] overflow-hidden border border-[#E5E7EB] shadow-lg group bg-[#F9FAFB]">
-                  <img src={preview} alt="ECG Trace" className="w-full h-[300px] object-contain" />
-                  <div className="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+              <div className="space-y-8">
+                <div className="relative rounded-[2rem] overflow-hidden border border-slate-100 shadow-2xl group bg-slate-50 aspect-[16/9]">
+                  <img src={preview} alt="ECG Trace" className="w-full h-full object-contain" />
+                  <div className="absolute inset-0 bg-[#1A1A1A]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                     <button 
                       onClick={reset}
-                      className="px-6 py-3 bg-white text-red-500 rounded-xl shadow-xl hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                      className="px-8 py-3 bg-white text-red-500 rounded-xl shadow-2xl hover:bg-red-500 hover:text-white transition-all flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest"
                     >
-                      <X size={14} /> Remove Image
+                      <X size={16} /> Discard Image
                     </button>
                   </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-[#F9FAFB] border border-[#E5E7EB] gap-6 rounded-2xl">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white border border-[#E5E7EB] text-[#111111] rounded-xl">
-                      <FileImage size={20} />
+                <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50/50 border border-slate-100 gap-6 rounded-2xl">
+                  <div className="flex items-center gap-5">
+                    <div className="p-4 bg-white border border-slate-100 text-[#14B8A6] rounded-xl shadow-sm">
+                      <FileImage size={24} />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[10px] font-bold text-[#111111] uppercase tracking-widest truncate max-w-[200px]">{file.name}</div>
-                      <div className="text-[9px] text-[#6B7280] font-bold uppercase tracking-widest mt-0.5">{(file.size / (1024 * 1024)).toFixed(2)} MB</div>
+                      <div className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-widest truncate max-w-[200px]">{file.name}</div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{(file.size / (1024 * 1024)).toFixed(2)} MB</div>
                     </div>
                   </div>
                   <button 
                     onClick={handleUpload}
                     disabled={loading}
-                    className="btn-primary-dark !py-4 !px-8 text-xs flex items-center justify-center gap-3 w-full sm:w-auto"
+                    className="btn-premium-teal !py-4 !px-10 text-[11px] uppercase tracking-[0.3em] shadow-xl w-full sm:w-auto"
                   >
                     {loading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Analyzing...</>
                     ) : (
-                      <>Initialize AI Analysis <ArrowRight size={16} /></>
+                      <>Sync with Neural Engine <ArrowRight size={18} /></>
                     )}
                   </button>
                 </div>
@@ -162,70 +166,74 @@ const UploadPage = () => {
             )}
 
             {error && (
-              <div className="mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider">
-                <AlertCircle size={16} />
+              <motion.div 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="mt-8 p-5 bg-red-50 border-l-4 border-red-500 text-red-600 rounded-r-xl flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest"
+              >
+                <AlertCircle size={18} />
                 {error}
-              </div>
+              </motion.div>
             )}
           </motion.div>
         ) : (
           <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-[#E5E7EB] rounded-[2rem] shadow-2xl overflow-hidden"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="premium-card bg-white border-teal-50/50 shadow-3xl overflow-hidden"
           >
             {/* Report Header */}
-            <div className="bg-[#F9FAFB] p-8 border-b border-[#E5E7EB] flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="bg-slate-50/50 p-10 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
               <div>
-                <div className="flex items-center gap-2 text-[#E8A26A] font-bold text-[9px] uppercase tracking-widest mb-3">
-                  <ShieldCheck size={14} /> Official Analysis Report
+                <div className="flex items-center gap-2 text-[#14B8A6] font-bold text-[10px] uppercase tracking-[0.3em] mb-4">
+                  <ShieldCheck size={16} /> Neural Classification Report
                 </div>
-                <h2 className="text-2xl font-bold text-[#111111] tracking-tight">Diagnostic Summary</h2>
+                <h2 className="text-3xl font-bold text-[#1A1A1A] tracking-tight">Diagnostic Summary</h2>
               </div>
               <div className="text-right">
-                <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Report ID</div>
-                <div className="text-[10px] font-bold text-[#111111] font-mono">{result.id.slice(-12).toUpperCase()}</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2">Telemetry ID</div>
+                <div className="text-[11px] font-bold text-[#1A1A1A] font-mono bg-white px-3 py-1 rounded-lg border border-slate-100">{result.id.slice(-12).toUpperCase()}</div>
               </div>
             </div>
 
-            <div className="p-8 space-y-10">
+            <div className="p-10 space-y-12">
               {/* Main Results Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
-                  <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Neural Classification</div>
-                  <div className={`text-3xl font-bold tracking-tight ${result.prediction === 'Normal' ? 'text-[#111111]' : 'text-red-500'}`}>
+                <div className="p-8 bg-slate-50/30 rounded-3xl border border-slate-100 group hover:border-[#14B8A6] transition-all">
+                  <div className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.2em] mb-3">Primary Classification</div>
+                  <div className={`text-4xl font-bold tracking-tight ${result.prediction === 'Normal' ? 'text-[#1A1A1A]' : 'text-red-500'}`}>
                     {result.prediction}
                   </div>
                 </div>
-                <div className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
-                  <div className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Confidence Index</div>
-                  <div className="text-3xl font-bold text-[#111111] tracking-tight">
+                <div className="p-8 bg-slate-50/30 rounded-3xl border border-slate-100 group hover:border-sky-400 transition-all">
+                  <div className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.2em] mb-3">Confidence Index</div>
+                  <div className="text-4xl font-bold text-[#1A1A1A] tracking-tight">
                     {(result.confidence * 100).toFixed(1)}%
                   </div>
                 </div>
               </div>
 
               {/* Informatics Table */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-[#F3F4F6] pb-3">
-                  <h3 className="text-[9px] font-bold text-[#111111] uppercase tracking-widest">Informatics Distribution</h3>
+              <div className="space-y-8">
+                <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+                  <h3 className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-[0.3em]">Probability Distribution</h3>
                 </div>
                 
-                <div className="grid gap-4">
+                <div className="grid gap-6">
                   {result.breakdown && result.breakdown.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-6">
-                      <div className="w-24 text-[9px] font-bold text-[#111111] uppercase tracking-widest truncate">
+                    <div key={idx} className="flex items-center gap-8">
+                      <div className="w-28 text-[10px] font-bold text-[#1A1A1A] uppercase tracking-widest truncate">
                         {item.label}
                       </div>
-                      <div className="flex-1 h-1 bg-[#F3F4F6] rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${item.percentage}%` }}
                           transition={{ duration: 1.5, ease: "circOut" }}
-                          className={`h-full ${item.label.toLowerCase().includes('normal') ? 'bg-[#111111]' : 'bg-[#E8A26A]'}`}
+                          className={`h-full ${item.label.toLowerCase().includes('normal') ? 'bg-[#14B8A6]' : 'bg-red-400'}`}
                         />
                       </div>
-                      <div className="w-12 text-right text-[9px] font-bold text-[#111111] tabular-nums">
+                      <div className="w-14 text-right text-[11px] font-bold text-[#1A1A1A] tabular-nums">
                         {(item.percentage).toFixed(1)}%
                       </div>
                     </div>
@@ -234,18 +242,18 @@ const UploadPage = () => {
               </div>
 
               {/* Report Actions */}
-              <div className="pt-8 border-t border-[#F3F4F6] flex flex-col sm:flex-row gap-4">
+              <div className="pt-10 border-t border-slate-50 flex flex-col sm:flex-row gap-5">
                 <button 
                   onClick={() => handleView(result.id)}
-                  className="flex-1 btn-primary-dark !py-4 flex items-center justify-center gap-3 text-xs"
+                  className="flex-1 btn-premium-teal !py-4 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.3em] shadow-xl"
                 >
-                  <Eye size={16} /> Clinical PDF Report
+                  <Eye size={18} /> Review PDF Report
                 </button>
                 <button 
                   onClick={() => handleDownload(result.id)}
-                  className="flex-1 btn-outline-dark !py-4 flex items-center justify-center gap-3 text-xs"
+                  className="flex-1 btn-outline-premium !py-4 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.3em]"
                 >
-                  <Download size={16} /> Download Data
+                  <Download size={18} /> Export Data
                 </button>
               </div>
             </div>
@@ -253,15 +261,15 @@ const UploadPage = () => {
         )}
 
         {/* Requirements Section */}
-        <div className="bg-white p-8 rounded-[1.5rem] border border-[#E5E7EB]">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="premium-card p-8 bg-white border-slate-100">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-10">
             <div>
-              <h3 className="text-[10px] font-bold text-[#111111] uppercase tracking-[0.2em] mb-1">Analysis Requirements</h3>
-              <p className="text-[11px] text-[#6B7280] font-medium">Criteria for optimal neural classification accuracy.</p>
+              <h3 className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-[0.3em] mb-2">Protocol Requirements</h3>
+              <p className="text-xs text-slate-500 font-medium">Optimal neural accuracy criteria.</p>
             </div>
-            <div className="flex flex-wrap gap-6">
-              <RequirementItem label="Clear Trace" />
-              <RequirementItem label="Low Noise" />
+            <div className="flex flex-wrap gap-10">
+              <RequirementItem label="Clinical Trace" />
+              <RequirementItem label="Low Latency" />
               <RequirementItem label="High Contrast" />
             </div>
           </div>
@@ -272,9 +280,11 @@ const UploadPage = () => {
 };
 
 const RequirementItem = ({ label }) => (
-  <div className="flex items-center gap-2.5">
-    <CheckCircle size={14} className="text-[#111111]" />
-    <span className="text-[9px] font-bold text-[#111111] uppercase tracking-widest">{label}</span>
+  <div className="flex items-center gap-3">
+    <div className="w-5 h-5 bg-teal-50 text-[#14B8A6] rounded-full flex items-center justify-center shadow-sm">
+      <CheckCircle size={14} />
+    </div>
+    <span className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-widest">{label}</span>
   </div>
 );
 
