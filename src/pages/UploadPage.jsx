@@ -230,7 +230,7 @@ const UploadPage = () => {
                           initial={{ width: 0 }}
                           animate={{ width: `${item.percentage}%` }}
                           transition={{ duration: 1.5, ease: "circOut" }}
-                          className={`h-full ${item.label.toLowerCase().includes('normal') ? 'bg-[#14B8A6]' : 'bg-red-400'}`}
+                          className={`h-full ${(item.label.toLowerCase().includes('normal') && !item.label.toLowerCase().includes('abnormal')) ? 'bg-[#14B8A6]' : 'bg-red-400'}`}
                         />
                       </div>
                       <div className="w-14 text-right text-[11px] font-bold text-[#1A1A1A] tabular-nums">

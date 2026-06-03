@@ -83,7 +83,14 @@ const DoctorSearchPage = () => {
 
 
   return (
-    <div className="pt-28 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F8FAFC] relative">
+    <div className="pt-20 pb-20 px-6 lg:px-10 max-w-[1440px] mx-auto min-h-screen bg-[#F8FAFC] relative">
+      <button 
+        onClick={() => navigate('/doctor')} 
+        className="btn-outline-premium group px-5 py-2.5 flex items-center gap-2 mb-6"
+      >
+        <ChevronLeft size={16} className="text-slate-400 group-hover:text-[#14B8A6] transition-colors" /> <span className="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
+      </button>
+
       {/* Top Search Controls */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
         <div className="flex flex-col">
@@ -100,7 +107,7 @@ const DoctorSearchPage = () => {
             <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#14B8A6] transition-colors" />
             <input 
               type="text" 
-              className="input-premium w-full pl-16 pr-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] shadow-sm" 
+              className="input-premium !bg-white border-teal-100 focus:border-[#14B8A6] w-full pl-16 pr-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] shadow-sm" 
               placeholder="SEARCH REGISTRY..." 
               value={searchTerm}
               onChange={(e) => {

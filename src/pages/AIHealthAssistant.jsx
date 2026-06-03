@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, ArrowLeft, HeartPulse, Paperclip, X, FileText, Loader2, Plus, MessageSquare, Trash2, Layout, Share2, MoreHorizontal, Activity, Maximize2, Minimize2, Settings, Square, Minus, Mic, Image, Edit2, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Send, User, ArrowLeft, HeartPulse, Paperclip, X, FileText, Loader2, Plus, MessageSquare, Trash2, Layout, Share2, MoreHorizontal, Activity, Maximize2, Minimize2, Settings, Square, Minus, Mic, Image, Edit2, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import ClinicalAIIcon from '../components/ClinicalAIIcon';
 
 const AIHealthAssistant = () => {
   const { user } = useAuth();
@@ -314,7 +315,7 @@ const AIHealthAssistant = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   className="w-16 h-16 bg-teal-50 text-[#14B8A6] rounded-2xl flex items-center justify-center mb-8 shadow-inner"
                 >
-                  <Bot size={32} />
+                  <ClinicalAIIcon size={32} />
                 </motion.div>
                 <h1 className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-3 tracking-tight">Clinical Consultation</h1>
                 <p className="text-slate-500 text-base max-w-lg mb-12 font-medium">Expert insights on cardiac telemetry and diagnostic protocols.</p>
@@ -349,7 +350,7 @@ const AIHealthAssistant = () => {
                   >
                     <div className={`flex gap-4 max-w-[85%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm border ${msg.sender === 'user' ? 'bg-[#1A1A1A] border-white/10 text-white' : 'bg-white border-teal-50 text-[#14B8A6]'}`}>
-                        {msg.sender === 'user' ? <User size={18} /> : <Bot size={18} />}
+                        {msg.sender === 'user' ? <User size={18} /> : <ClinicalAIIcon size={18} />}
                       </div>
                       <div className="flex flex-col gap-2">
                         <div className={`text-[14px] leading-relaxed group relative ${msg.sender === 'user' ? 'bg-[#1A1A1A] text-white px-6 py-4 rounded-[1.75rem] rounded-tr-none shadow-lg' : 'text-[#1A1A1A] bg-white border border-slate-100 px-6 py-4 rounded-[1.75rem] rounded-tl-none shadow-sm'}`}>
@@ -389,7 +390,7 @@ const AIHealthAssistant = () => {
                     animate={{ opacity: 1 }}
                     className="flex gap-4"
                   >
-                    <div className="w-9 h-9 bg-teal-50 border border-teal-100 rounded-xl text-[#14B8A6] flex items-center justify-center shadow-sm"><Bot size={18} /></div>
+                    <div className="w-9 h-9 bg-teal-50 border border-teal-100 rounded-xl text-[#14B8A6] flex items-center justify-center shadow-sm"><ClinicalAIIcon size={18} /></div>
                     <div className="flex items-center gap-3 px-6 py-3 bg-white border border-slate-50 rounded-[1.75rem] rounded-tl-none shadow-sm border-dashed">
                       <div className="flex gap-1">
                         <div className="w-1 h-1 bg-[#14B8A6] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />

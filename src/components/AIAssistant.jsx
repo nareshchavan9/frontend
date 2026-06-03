@@ -6,7 +6,6 @@ import {
   MessageSquare, 
   Send, 
   X, 
-  Bot, 
   User, 
   Sparkles, 
   Loader2, 
@@ -19,6 +18,7 @@ import {
   Edit2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ClinicalAIIcon from './ClinicalAIIcon';
 
 const AIAssistant = ({ role = 'patient' }) => {
   const navigate = useNavigate();
@@ -187,7 +187,7 @@ const AIAssistant = ({ role = 'patient' }) => {
             <div className={`p-4 ${role === 'doctor' ? 'bg-healthcare-dark' : 'bg-healthcare-blue'} text-white flex items-center justify-between`}>
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-2 rounded-xl">
-                  {role === 'doctor' ? <Stethoscope size={20} /> : <Bot size={20} />}
+                  {role === 'doctor' ? <Stethoscope size={20} /> : <ClinicalAIIcon size={20} />}
                 </div>
                 <div>
                   <div className="text-sm font-bold">AI Assistant</div>
